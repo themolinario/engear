@@ -1,0 +1,40 @@
+.video-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.video-item {
+    background-color: #f5f5f5;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    cursor: pointer;
+}
+
+.video-item:hover {
+    background-color: #ccc;
+}
+
+.video-item img {
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+}
+
+.video-info {
+    padding: 10px;
+}
+
+.video-info h2 {
+    font-size: 1.2rem;
+    margin: 0;
+    margin-bottom: 5px;
+}
+
+.video-info p {
+    font-size: 0.9rem;
+    margin: 0;
+    color: #666;
+}
