@@ -13,14 +13,9 @@ import {utils} from "./utils/index.js";
 import {auth} from "./strategies/auth.js";
 
 const app = express();
+const PORT = 80
 
 dotenv.config();
-
-const connect = () => {
-    mongoose.connect(process.env.MONGO).then(() => {
-        utils.logger.info("Connected to DB");
-    }).catch(err => utils.logger.error(err));
-};
 
 app.use(cors());
 app.use(cookieParser());
@@ -45,7 +40,13 @@ app.use((err, req, res, next) => {
     })
 })
 
-app.listen(80, () => {
+const connect = () => {
+    mongoose.connect(process.env.MONGO).then(() => {
+        utils.logger.info("Connected to DB");
+    }).catch(err => utils.logger.error(err));
+};
+
+app.listen(PORT, () => {
     connect();
-    console.log('Connected!');
+    console.log("Server is listening to port " + PORT)
 })
