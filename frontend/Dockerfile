@@ -1,15 +1,20 @@
-#Stage 1
-FROM node:18-alpine as builder
-WORKDIR /app
-COPY package.json .
-COPY package-lock.json .
-RUN npm install
-COPY . .
-RUN npm run build
+# Usa un'immagine di base con Node.js
+FROM node:18-alpine
 
-#Stage 2
-FROM nginx:1.19.0
-WORKDIR /usr/share/nginx/html
-RUN rm -rf ./*
-COPY --from=builder /app/dist .
-ENTRYPOINT ["nginx", "-g", "daemon off;"]
+# Imposta il percorso di lavoro nel container
+WORKDIR /app
+
+# Copia i file di package.json e package-lock.json per installare le dipendenze iniziali
+COPY package*.json .
+
+# Esegui l'installazione delle dipendenze
+RUN npm install
+
+# Copia il resto del codice sorgente nell'immagine
+COPY . .
+
+# Esponi la porta su cui verrà eseguita l'applicazione
+EXPOSE 5173
+
+# Definisci il comando di avvio per l'applicativo
+CMD ["npm", "run", "dev"]

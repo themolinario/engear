@@ -2,9 +2,10 @@ version: "3.8"
 
 services:
   app:
-    container_name: docker-react-c
-    image: docker-react-i
+    container_name: docker-engear-fe-c
+    image: docker-engear-fe-i
     build:
       context: .
     ports:
-      - 8080:8080
+      - 5173:5173
+
