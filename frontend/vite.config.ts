@@ -1,11 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vitejs.dev/config/
-// export default defineConfig({
-//   plugins: [react()],
-// })
-
+// This step is required to map the port between Docker container and your React app
 export default defineConfig({
   plugins: [react()],
   server: {
