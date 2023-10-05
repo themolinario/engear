@@ -20,10 +20,10 @@ import {
     useTheme
 } from "@mui/material";
 import MuiDrawer from '@mui/material/Drawer';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
+import FormatListNumberedRtlIcon from '@mui/icons-material/FormatListNumberedRtl';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import MailIcon from '@mui/icons-material/Mail';
+import DashboardIcon from '@mui/icons-material/Dashboard';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import {useState} from "react";
 import {useNavigate} from "react-router-dom";
@@ -254,7 +254,7 @@ export default function NavBar() {
                 </List>
                 <Divider />
                 <List>
-                    {['Da costruire'].map((text, index) => (
+                    {['Dashboard', 'Metrics'].map((text, index) => (
                         <ListItem key={text} disablePadding sx={{ display: 'block' }}>
                             <ListItemButton
                                 sx={{
@@ -262,6 +262,7 @@ export default function NavBar() {
                                     justifyContent: open ? 'initial' : 'center',
                                     px: 2.5,
                                 }}
+                                onClick={() => text === "Dashboard" ? navigate("/home") : text === "Metrics" ? navigate("/metrics") : navigate("/")}
                             >
                                 <ListItemIcon
                                     sx={{
@@ -270,7 +271,7 @@ export default function NavBar() {
                                         justifyContent: 'center',
                                     }}
                                 >
-                                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                                    {index % 2 === 0 ? <DashboardIcon /> : <FormatListNumberedRtlIcon />}
                                 </ListItemIcon>
                                 <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
                             </ListItemButton>

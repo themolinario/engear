@@ -5,6 +5,7 @@ import {AddVideoPage} from "./pages/AddVideoPage";
 import {LoginPage} from "./pages/LoginPage";
 import Home from "./pages/HomePage";
 import {SignUpPage} from "./pages/SignUpPage";
+import {MetricsPage} from "./pages/MetricsPage";
 
 export const router = createBrowserRouter([
     {
@@ -33,9 +34,11 @@ export const router = createBrowserRouter([
             {
                 path: "/add-video",
                 element: <AddVideoPage />
+            },
+            {
+                path: "/metrics",
+                element: <MetricsPage />
             }
-
-
         ]
     }
 ])
