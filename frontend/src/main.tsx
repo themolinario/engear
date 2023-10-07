@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import {RouterProvider} from "react-router-dom";
 import {router} from "./router";
 import {CustomQueryClientProvider} from "./CustomQueryClientProvider.tsx";
+import 'bootstrap/dist/css/bootstrap.css';
 
 
 

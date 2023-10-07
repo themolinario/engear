@@ -88,89 +88,84 @@ export function AddVideoPage () {
 
 
     return (
-        <Container component="main" maxWidth="xs">
+        <Container maxWidth="xs">
             <CssBaseline />
             <Box
-                sx={{
-                    marginTop: 8,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                }}
+                className="d-flex flex-column align-items-center mt-5"
             >
-                <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-                    <FileUploadIcon />
-                </Avatar>
-                <Typography component="h1" variant="h5">
-                    Upload A Video
-                </Typography>
-                <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-                    <Typography >Pick Video File: </Typography>
-                    <Box
-                        sx={{
-                            marginTop: 2,
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            borderColor: "blue",
-                            padding: 2,
-                            border: 4,
-                            borderRadius: 2,
-                            marginBottom: 2
-                        }}
-                    >
-                        <input
-                            type="file"
-                            accept="video/*"
-                            id="video"
-                            name="video"
-                            required
-                            onChange={(e) => {if (e.target.files) setVideo(e.target.files[0])}}
-                        />
-                        {videoPerc}
-                    </Box>
-                    <Typography >Set Preview Image: </Typography>
-                    <Box
-                        sx={{
-                            marginTop: 2,
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            borderColor: "blue",
-                            padding: 2,
-                            border: 4,
-                            borderRadius: 2
-                        }}
-                    >
+                <Box className="card">
+                    <Box className="card-body d-flex flex-column align-items-center">
+                        <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+                            <FileUploadIcon />
+                        </Avatar>
+                        <Typography component="h1" variant="h5">
+                            Upload A Video
+                        </Typography>
+                        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+                            <Typography >Pick Video File: </Typography>
+                            <Box
+                              sx={{
+                                  marginTop: 2,
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  alignItems: 'center',
+                                  padding: 2,
+                                  marginBottom: 2
+                              }}
+                            >
+                                <input
+                                  type="file"
+                                  accept="video/*"
+                                  id="video"
+                                  name="video"
+                                  required
+                                  onChange={(e) => {if (e.target.files) setVideo(e.target.files[0])}}
+                                />
+                                {videoPerc}
+                            </Box>
+                            <Typography >Set Preview Image: </Typography>
+                            <Box
+                              sx={{
+                                  marginTop: 2,
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  alignItems: 'center',
+                                  padding: 2,
 
-                        <input
-                            type="file"
-                            required
-                            accept="image/*"
-                            id="image"
-                            name="image"
-                            onChange={(e) => {if (e.target.files) setImg(e.target.files[0])}}
-                        />
-                        {imgPerc}
+                              }}
+                            >
+
+                                <input
+                                  type="file"
+                                  required
+                                  accept="image/*"
+                                  id="image"
+                                  name="image"
+                                  onChange={(e) => {if (e.target.files) setImg(e.target.files[0])}}
+                                />
+                                {imgPerc}
+                            </Box>
+                            <TextField
+                              id="title"
+                              placeholder="Inserisci titolo"
+                              onChange={e => setTitle(e.target.value)}
+                            />
+                            <TextField
+                              id="description"
+                              placeholder="Inserisci descrizione"
+                              onChange={e => setDesc(e.target.value)}
+                            />
+                            <Button
+                              type="submit"
+                              fullWidth
+                              variant="contained"
+                              sx={{ mt: 3, mb: 2 }}
+                            >
+                                Publish
+                            </Button>
                     </Box>
-                    <TextField
-                        id="title"
-                        placeholder="Inserisci titolo"
-                        onChange={e => setTitle(e.target.value)}
-                    />
-                    <TextField
-                        id="description"
-                        placeholder="Inserisci descrizione"
-                        onChange={e => setDesc(e.target.value)}
-                    />
-                    <Button
-                        type="submit"
-                        fullWidth
-                        variant="contained"
-                        sx={{ mt: 3, mb: 2 }}
-                    >
-                        Publish
-                    </Button>
+                </Box>
+
                 </Box>
             </Box>
         </Container>
