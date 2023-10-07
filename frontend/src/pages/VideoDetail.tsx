@@ -23,8 +23,6 @@ function VideoDetail () {
     if (isLoading) return <PageLoader />;
 
 
-
-
     return (
         <div>
             <h1>{video?.data.title}</h1>
