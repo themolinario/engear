@@ -15,7 +15,7 @@ export interface IVideo {
 }
 
 export interface IUpdateStreamDataTotalVariables {
-  id: IVideo['_id'],
+  id?: string,
   playedSeconds: number
 
 }

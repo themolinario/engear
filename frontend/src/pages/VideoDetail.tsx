@@ -6,11 +6,13 @@ import { PageLoader } from "../components/basic/PageLoader.tsx";
 import { OnProgressProps } from "react-player/base";
 import { formatTime } from "../utils/utils.ts";
 import { useEffect, useRef, useState } from "react";
+import { updateStreamedTimeByUser } from "../api/user.ts";
 
 function VideoDetail() {
   const { videoId } = useParams();
   const [playedSeconds, setPlayedSeconds] = useState(0);
   const playedSecondsRef = useRef(0);
+  const playedSecondsByUserRef = useRef(0);
   const [views, setViews] = useState(0);
 
   const { data: video, isLoading } = useQuery({
@@ -21,6 +23,7 @@ function VideoDetail() {
 
   const updateViewsMutation = useMutation({ mutationFn: addView });
   const updateStreamedTimeTotalMutation = useMutation({ mutationFn: updateStreamedTimeTotal });
+  const updateStreamedTimeByUserMutation = useMutation({ mutationFn: updateStreamedTimeByUser });
 
   useEffect(() => {
     if (!isLoading) {
@@ -56,6 +59,10 @@ function VideoDetail() {
       updateStreamedTimeTotalMutation.mutate({ id: videoId, playedSeconds: playedSecondsRef.current });
       console.log("unmount update", playedSecondsRef.current);
     }
+
+    if (playedSecondsByUserRef.current) {
+      updateStreamedTimeByUserMutation.mutate(playedSecondsByUserRef.current);
+    }
   };
 
   const handleProgress = (state: OnProgressProps) => {
@@ -63,6 +70,9 @@ function VideoDetail() {
       setPlayedSeconds(prev => prev + 1);
       playedSecondsRef.current = playedSeconds + 1;
       console.log("progress video: ", playedSecondsRef.current);
+
+      playedSecondsByUserRef.current = state.playedSeconds;
+      console.log("playedSeconds", playedSecondsByUserRef.current)
 
     }
   };
