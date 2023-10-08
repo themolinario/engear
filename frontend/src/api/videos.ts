@@ -3,6 +3,7 @@ import {IVideo} from "../types/Video.ts";
 import axios from "axios";
 
 const baseURL = "http://localhost:80/api";
+const headers = {Authorization: `Bearer ${window.sessionStorage.getItem('token')}`}
 export function getRandomVideos () {
     return axios.get<IVideo[]>('videos/random', {baseURL});
 }
@@ -20,7 +21,7 @@ export function updateVideoById (video: Partial<IVideo>) {
 }
 
 export function postVideo (video: Partial<IVideo>) {
-    return axios.post<IVideo>('videos', video, {baseURL})
+    return axios.post<IVideo>('videos', video, {baseURL, headers})
 }
 
 export function addView (_id: IVideo["_id"]) {
