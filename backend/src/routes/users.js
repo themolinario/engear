@@ -6,7 +6,7 @@ import {
   getUser,
   like,
   subscribe,
-  unsubscribe, updateRebufferingEvents,
+  unsubscribe, updateRebufferingEvents, updateRebufferingTime,
   // update,
   updateStreamedTimeByUser
 } from "../controllers/user.js";
@@ -34,5 +34,7 @@ router.put("/dislike/:videoId", verifyToken, dislike);
 router.put("/streamedTimeTotal", verifyToken, updateStreamedTimeByUser);
 
 router.put("/rebufferingEvents", verifyToken, updateRebufferingEvents);
+
+router.put("/updateRebufferingTime", verifyToken, updateRebufferingTime)
 
 export default router;

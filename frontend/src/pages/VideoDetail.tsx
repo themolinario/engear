@@ -4,9 +4,9 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { addView, findVideoById, updateStreamedTimeTotal } from "../api/videos.ts";
 import { PageLoader } from "../components/basic/PageLoader.tsx";
 import { OnProgressProps } from "react-player/base";
-import { formatTime } from "../utils/utils.ts";
+import { formatTime, millisToMinutesAndSeconds } from "../utils/utils.ts";
 import { useEffect, useRef, useState } from "react";
-import { updateRebufferingEvents, updateStreamedTimeByUser } from "../api/user.ts";
+import { updateRebufferingEvents, updateRebufferingTime, updateStreamedTimeByUser } from "../api/user.ts";
 
 function VideoDetail() {
   const { videoId } = useParams();
@@ -14,6 +14,7 @@ function VideoDetail() {
   const playedSecondsRef = useRef(0);
   const playedSecondsByUserRef = useRef(0);
   const [views, setViews] = useState(0);
+  const bufferingTimeRef = useRef(0)
 
   const { data: video, isLoading } = useQuery({
     queryKey: [videoId],
@@ -25,6 +26,7 @@ function VideoDetail() {
   const updateStreamedTimeTotalMutation = useMutation({ mutationFn: updateStreamedTimeTotal });
   const updateStreamedTimeByUserMutation = useMutation({ mutationFn: updateStreamedTimeByUser });
   const updateRebufferingEventsMutation = useMutation({ mutationFn: updateRebufferingEvents });
+  const updateRebufferingTimeMutation = useMutation({mutationFn: updateRebufferingTime})
 
   useEffect(() => {
     if (!isLoading) {
@@ -82,11 +84,17 @@ function VideoDetail() {
 
   const handleBuffer = () => {
     console.log("buffer events triggered")
+    bufferingTimeRef.current = Date.now()
     updateRebufferingEventsMutation.mutate()
   };
 
   const handleBufferEnd = () => {
+    const bufferingTimeEnd = Date.now()
+    bufferingTimeRef.current = bufferingTimeEnd - bufferingTimeRef.current
 
+    updateRebufferingTimeMutation.mutate(bufferingTimeRef.current) // to go when left component
+    console.log("Rebuffering time: ", bufferingTimeRef.current)
+    console.log("Result of format of rebuffering:",  millisToMinutesAndSeconds( bufferingTimeRef.current))
   };
 
 

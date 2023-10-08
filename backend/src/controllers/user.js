@@ -155,6 +155,25 @@ export const updateRebufferingEvents = async (req, res, next) => {
     }
 
     res.status(200).json("Success");
+  } catch (e) {
+    next(e);
+  }
+};
+
+export const updateRebufferingTime = async (req, res, next) => {
+  try {
+    const { id } = req.user;
+    const { rebufferingTime } = req.body;
+
+    const user = await User.findByIdAndUpdate(id, {
+      $inc: { rebufferingTime: rebufferingTime },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json(user);
 
   } catch (e) {
     next(e);

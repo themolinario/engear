@@ -33,6 +33,10 @@ const UserSchema = new mongoose.Schema(
     rebufferingEvents: {
       type: Number,
       default: 0
+    },
+    rebufferingTime: {
+      type: Number,
+      default: 0
     }
   },
   { timestamps: true },

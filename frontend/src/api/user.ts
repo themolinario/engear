@@ -14,3 +14,7 @@ export function getCurrentUser() {
 export function updateRebufferingEvents() {
   return axios.put(`users/rebufferingEvents`, {}, { baseURL, headers });
 }
+
+export function updateRebufferingTime(rebufferingTime: number) {
+  return axios.put(`users/updateRebufferingTime`, { rebufferingTime }, { baseURL, headers });
+}
