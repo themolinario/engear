@@ -26,7 +26,7 @@ const VideoSchema = new mongoose.Schema({
             type: Number,
             default: 0
         },
-        streamedTotal: {
+        streamedTimeTotal: {
             type: Number,
             default: 0
         },
