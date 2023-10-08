@@ -71,7 +71,7 @@ function VideoDetail() {
       playedSecondsRef.current = playedSeconds + 1;
       console.log("progress video: ", playedSecondsRef.current);
 
-      playedSecondsByUserRef.current = state.playedSeconds;
+      playedSecondsByUserRef.current += 1;
       console.log("playedSeconds", playedSecondsByUserRef.current)
 
     }
