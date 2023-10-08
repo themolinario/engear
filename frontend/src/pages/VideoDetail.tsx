@@ -6,7 +6,7 @@ import { PageLoader } from "../components/basic/PageLoader.tsx";
 import { OnProgressProps } from "react-player/base";
 import { formatTime } from "../utils/utils.ts";
 import { useEffect, useRef, useState } from "react";
-import { updateStreamedTimeByUser } from "../api/user.ts";
+import { updateRebufferingEvents, updateStreamedTimeByUser } from "../api/user.ts";
 
 function VideoDetail() {
   const { videoId } = useParams();
@@ -24,6 +24,7 @@ function VideoDetail() {
   const updateViewsMutation = useMutation({ mutationFn: addView });
   const updateStreamedTimeTotalMutation = useMutation({ mutationFn: updateStreamedTimeTotal });
   const updateStreamedTimeByUserMutation = useMutation({ mutationFn: updateStreamedTimeByUser });
+  const updateRebufferingEventsMutation = useMutation({ mutationFn: updateRebufferingEvents });
 
   useEffect(() => {
     if (!isLoading) {
@@ -72,10 +73,22 @@ function VideoDetail() {
       console.log("progress video: ", playedSecondsRef.current);
 
       playedSecondsByUserRef.current += 1;
-      console.log("playedSeconds", playedSecondsByUserRef.current)
+      console.log("playedSeconds", playedSecondsByUserRef.current);
 
     }
   };
+
+  // Gestire il numero di rebuffering per tutta l'applicazione
+
+  const handleBuffer = () => {
+    console.log("buffer events triggered")
+    updateRebufferingEventsMutation.mutate()
+  };
+
+  const handleBufferEnd = () => {
+
+  };
+
 
   if (isLoading) return <PageLoader />;
 
@@ -88,6 +101,8 @@ function VideoDetail() {
           height="100%"
           url={video?.data.videoUrl}
           onProgress={handleProgress}
+          onBuffer={handleBuffer}
+          onBufferEnd={handleBufferEnd}
           controls />
       </div>
       <h2>Views: {views}</h2>

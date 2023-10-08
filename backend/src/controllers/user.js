@@ -1,6 +1,7 @@
 import { createError } from "../error.js";
 import User from "../models/User.js";
 import Video from "../models/Video.js";
+import { addSuffix } from "yarn/lib/cli.js";
 
 export const update = async (req, res, next) => {
   if (req.params.id === req.user.id) {
@@ -48,12 +49,12 @@ export const getUser = async (req, res, next) => {
 export const getCurrentUser = async (req, res, next) => {
   try {
     const { id } = req.user;
-    const user = await User.findById(id)
+    const user = await User.findById(id);
     res.status(200).json(user);
   } catch (e) {
-    next(e)
+    next(e);
   }
-}
+};
 
 export const subscribe = async (req, res, next) => {
   try {
@@ -136,6 +137,25 @@ export const updateStreamedTimeByUser = async (req, res, next) => {
     }
 
     res.status(200).json(user);
+  } catch (e) {
+    next(e);
+  }
+};
+
+export const updateRebufferingEvents = async (req, res, next) => {
+  try {
+    const { id } = req.user;
+
+    const user = await User.findByIdAndUpdate(id, {
+      $inc: { rebufferingEvents: 1 },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json("Success");
+
   } catch (e) {
     next(e);
   }
