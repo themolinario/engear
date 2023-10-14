@@ -39,6 +39,12 @@ export function MetricsPage() {
 
   }, [queryClient]);
 
+  const getScreenSize = () => {
+    const width = window.screen.width.toString();
+    const height = window.screen.height.toString();
+    return width.concat("x").concat(height);
+  };
+
 
   if (queryClient.isFetching()) return <PageLoader />;
   return (
@@ -48,6 +54,7 @@ export function MetricsPage() {
       <h1>Total Streamed time: {metrics.currentUser}</h1>
       <h1>Rebuffering events: {metrics.rebufferingEvents}</h1>
       <h1>Rebuffering time: {metrics.rebufferingTime}</h1>
+      <h1>Screen size: {getScreenSize()}</h1>
     </div>
   );
 }
