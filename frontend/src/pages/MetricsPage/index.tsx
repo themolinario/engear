@@ -5,15 +5,18 @@ import { getCurrentUser, getSpeedTest } from "../../api/user.ts";
 import { formatTime, millisToMinutesAndSeconds } from "../../utils/utils.ts";
 import { useEffect, useState } from "react";
 
+const INIT_VALUE = {
+  ip: "N.N.",
+  userAgent: "N.N.",
+  currentUser: "N.N.",
+  rebufferingEvents: "N.N.",
+  rebufferingTime: "N.N.",
+  speedTest: "N.N."
+};
+
 export function MetricsPage() {
-  const [metrics, setMetrics] = useState({
-    ip: "",
-    userAgent: "",
-    currentUser: "",
-    rebufferingEvents: "",
-    rebufferingTime: "",
-    speedTest: ""
-  });
+  const [metrics, setMetrics] = useState(INIT_VALUE);
+  const [loading, setLoading] = useState(true);
 
   const queryClient = useQueryClient();
 
@@ -33,13 +36,12 @@ export function MetricsPage() {
         currentUser: formatTime(userResult.data?.streamedTimeTotal),
         rebufferingEvents: userResult.data?.rebufferingEvents,
         rebufferingTime: millisToMinutesAndSeconds(userResult.data?.rebufferingTime),
-        speedTest: speedTestResult.data?.downloadSpeed
-
+        speedTest: speedTestResult.data?.downloadSpeed?.toFixed(2)?.concat(" MB")
       });
 
     };
 
-    fetchData();
+    fetchData().then(() => setLoading(false));
 
 
   }, [queryClient]);
@@ -51,7 +53,8 @@ export function MetricsPage() {
   };
 
 
-  if (queryClient.isFetching()) return <PageLoader />;
+  if (loading) return <PageLoader />;
+
   return (
     <div>
       <h1>Your IP Address is: {metrics.ip}</h1>
