@@ -18,3 +18,7 @@ export function updateRebufferingEvents() {
 export function updateRebufferingTime(rebufferingTime: number) {
   return axios.put(`users/updateRebufferingTime`, { rebufferingTime }, { baseURL, headers });
 }
+
+export function getSpeedTest() {
+  return axios.get(`users/speedTest`, {baseURL})
+}

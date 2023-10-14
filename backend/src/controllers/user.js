@@ -2,6 +2,7 @@ import { createError } from "../error.js";
 import User from "../models/User.js";
 import Video from "../models/Video.js";
 import { addSuffix } from "yarn/lib/cli.js";
+import FastSpeedtest from "fast-speedtest-api";
 
 export const update = async (req, res, next) => {
   if (req.params.id === req.user.id) {
@@ -174,8 +175,27 @@ export const updateRebufferingTime = async (req, res, next) => {
     }
 
     res.status(200).json(user);
-
   } catch (e) {
     next(e);
+  }
+};
+
+export const getSpeedTest = async (req, res, next) => {
+  try {
+    const speedtest = new FastSpeedtest({
+      token: "YXNkZmFzZGxmbnNkYWZoYXNkZmhrYWxm", // required
+      // verbose: false, // default: false
+      // timeout: 10000, // default: 5000
+      // https: true, // default: true
+      // urlCount: 5, // default: 5
+      // bufferSize: 8, // default: 8
+      unit: FastSpeedtest.UNITS.Mbps, // default: Bps
+    });
+
+    const speed = await speedtest.getSpeed();
+    res.json({downloadSpeed: speed});
+  } catch (error) {
+    console.log(`Error during speed test: ${error}`);
+    res.status(500).json({ error: "Error during speed test" });
   }
 };

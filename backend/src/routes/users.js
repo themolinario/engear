@@ -3,15 +3,17 @@ import {
   deleteUser,
   dislike,
   getCurrentUser,
+  getSpeedTest,
   getUser,
   like,
   subscribe,
-  unsubscribe, updateRebufferingEvents, updateRebufferingTime,
+  unsubscribe,
+  updateRebufferingEvents,
+  updateRebufferingTime,
   // update,
-  updateStreamedTimeByUser
+  updateStreamedTimeByUser,
 } from "../controllers/user.js";
-import {verifyToken} from "../verifyToken.js";
-
+import { verifyToken } from "../verifyToken.js";
 
 const router = express.Router();
 
@@ -35,6 +37,8 @@ router.put("/streamedTimeTotal", verifyToken, updateStreamedTimeByUser);
 
 router.put("/rebufferingEvents", verifyToken, updateRebufferingEvents);
 
-router.put("/updateRebufferingTime", verifyToken, updateRebufferingTime)
+router.put("/updateRebufferingTime", verifyToken, updateRebufferingTime);
+
+router.get("/speedTest", getSpeedTest);
 
 export default router;
