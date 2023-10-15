@@ -9,7 +9,7 @@ import BasicTable from "./components/BasicTable.tsx";
 const INIT_VALUE = {
   ip: "N.N.",
   userAgent: "N.N.",
-  currentUser: "N.N.",
+  streamedTime: "N.N.",
   rebufferingEvents: "N.N.",
   rebufferingTime: "N.N.",
   speedTest: "N.N."
@@ -34,7 +34,7 @@ export function MetricsPage() {
       setMetrics({
         ip: ipResult.data.ip ?? "N.D.",
         userAgent: userAgentResult.data.name ?? "N.D",
-        currentUser: formatTime(userResult.data?.streamedTimeTotal),
+        streamedTime: formatTime(userResult.data?.streamedTimeTotal),
         rebufferingEvents: userResult.data?.rebufferingEvents,
         rebufferingTime: millisToMinutesAndSeconds(userResult.data?.rebufferingTime),
         speedTest: speedTestResult.data?.downloadSpeed?.toFixed(2)?.concat(" MB")
@@ -57,13 +57,13 @@ export function MetricsPage() {
     createData = (
       ip: string,
       userAgent: string,
-      currentUser: string,
+      streamedTime: string,
       rebufferingEvents: string,
       rebufferingTime: string,
       screenSize: string,
       speedTest: string
     ) => {
-      return { ip, userAgent, currentUser, rebufferingEvents, rebufferingTime, screenSize, speedTest };
+      return { ip, userAgent,  streamedTime, rebufferingEvents, rebufferingTime, screenSize, speedTest };
     };
 
 
@@ -71,7 +71,7 @@ export function MetricsPage() {
     createData(
       metrics.ip,
       metrics.userAgent,
-      metrics.currentUser,
+      metrics.streamedTime,
       metrics.rebufferingEvents,
       metrics.rebufferingTime,
       getScreenSize(),
@@ -82,7 +82,7 @@ export function MetricsPage() {
   const header = [
     "IP",
     "User agent",
-    "Current user",
+    "Streamed time",
     "Rebuffering events",
     "Rebuffering time",
     "Screen size",

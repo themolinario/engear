@@ -27,7 +27,7 @@ export default function BasicTable({ header, rows }: { header: any, rows: any })
                 {row.ip}
               </TableCell>
               <TableCell align="center">{row.userAgent}</TableCell>
-              <TableCell align="center">{row.currentUser}</TableCell>
+              <TableCell align="center">{row.streamedTime}</TableCell>
               <TableCell align="center">{row.rebufferingEvents}</TableCell>
               <TableCell align="center">{row.rebufferingTime}</TableCell>
               <TableCell align="center">{row.screenSize}</TableCell>
