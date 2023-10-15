@@ -80,13 +80,13 @@ export function MetricsPage() {
   ];
 
   const header = [
-    "ip",
-    "userAgent",
-    "currentUser",
-    "rebufferingEvents",
-    "rebufferingTime",
-    "screenSize",
-    "speedTest"
+    "IP",
+    "User agent",
+    "Current user",
+    "Rebuffering events",
+    "Rebuffering time",
+    "Screen size",
+    "Speed test"
   ];
 
 

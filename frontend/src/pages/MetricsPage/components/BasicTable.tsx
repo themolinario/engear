@@ -8,7 +8,7 @@ import Paper from "@mui/material/Paper";
 
 export default function BasicTable({ header, rows }: { header: any, rows: any }) {
   return (
-    <TableContainer component={Paper}>
+    <TableContainer component={Paper} sx={{ marginLeft: '36px', marginTop: '50px' }}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
           <TableRow>
