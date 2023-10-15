@@ -1,31 +1,45 @@
 import mongoose from "mongoose";
 
-const UserSchema = new mongoose.Schema({
+const UserSchema = new mongoose.Schema(
+  {
     name: {
-        type: String,
-        required: true,
-        unique: true,
+      type: String,
+      required: true,
+      unique: true,
     },
     email: {
-        type: String,
-        required: true,
-        unique: true
+      type: String,
+      required: true,
+      unique: true,
     },
     password: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
     img: {
-        type: String
+      type: String,
     },
     subscribers: {
-        type: Number,
-        default: 0
+      type: Number,
+      default: 0,
     },
     subscribedUsers: {
-        type: [String]
+      type: [String],
+    },
+    streamedTimeTotal: {
+      type: Number,
+      default: 0
+    },
+    rebufferingEvents: {
+      type: Number,
+      default: 0
+    },
+    rebufferingTime: {
+      type: Number,
+      default: 0
     }
-}, {timestamps: true}
+  },
+  { timestamps: true },
 );
 
 export default mongoose.model("User", UserSchema);
