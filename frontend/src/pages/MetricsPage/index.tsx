@@ -4,6 +4,7 @@ import { PageLoader } from "../../components/basic/PageLoader.tsx";
 import { getCurrentUser, getSpeedTest } from "../../api/user.ts";
 import { formatTime, millisToMinutesAndSeconds } from "../../utils/utils.ts";
 import { useEffect, useState } from "react";
+import BasicTable from "./components/BasicTable.tsx";
 
 const INIT_VALUE = {
   ip: "N.N.",
@@ -52,18 +53,55 @@ export function MetricsPage() {
     return width.concat("x").concat(height);
   };
 
+  const
+    createData = (
+      ip: string,
+      userAgent: string,
+      currentUser: string,
+      rebufferingEvents: string,
+      rebufferingTime: string,
+      screenSize: string,
+      speedTest: string
+    ) => {
+      return { ip, userAgent, currentUser, rebufferingEvents, rebufferingTime, screenSize, speedTest };
+    };
+
+
+  const rows = [
+    createData(
+      metrics.ip,
+      metrics.userAgent,
+      metrics.currentUser,
+      metrics.rebufferingEvents,
+      metrics.rebufferingTime,
+      getScreenSize(),
+      metrics.speedTest
+    )
+  ];
+
+  const header = [
+    "ip",
+    "userAgent",
+    "currentUser",
+    "rebufferingEvents",
+    "rebufferingTime",
+    "screenSize",
+    "speedTest"
+  ];
+
 
   if (loading) return <PageLoader />;
 
   return (
-    <div>
-      <h1>Your IP Address is: {metrics.ip}</h1>
-      <h1>Your User Agent is: {metrics.userAgent}</h1>
-      <h1>Total Streamed time: {metrics.currentUser}</h1>
-      <h1>Rebuffering events: {metrics.rebufferingEvents}</h1>
-      <h1>Rebuffering time: {metrics.rebufferingTime}</h1>
-      <h1>Screen size: {getScreenSize()}</h1>
-      <h1>Download rate: {metrics.speedTest}</h1>
-    </div>
+    <BasicTable header={header} rows={rows}></BasicTable>
+    // <div>
+    //   <h1>Your IP Address is: {metrics.ip}</h1>
+    //   <h1>Your User Agent is: {metrics.userAgent}</h1>
+    //   <h1>Total Streamed time: {metrics.currentUser}</h1>
+    //   <h1>Rebuffering events: {metrics.rebufferingEvents}</h1>
+    //   <h1>Rebuffering time: {metrics.rebufferingTime}</h1>
+    //   <h1>Screen size: {getScreenSize()}</h1>
+    //   <h1>Download rate: {metrics.speedTest}</h1>
+    // </div>
   );
 }
