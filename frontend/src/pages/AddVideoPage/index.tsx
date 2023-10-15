@@ -21,6 +21,7 @@ import { useNavigate } from "react-router-dom";
 import { LinearProgress } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import { AlertMessage } from "../../components/basic/AlertMessage.tsx";
 
 
 export function AddVideoPage() {
@@ -34,11 +35,17 @@ export function AddVideoPage() {
   const [videoURL, setVideoURL] = useState("");
   const [imgURL, setImgURL] = useState("");
   const navigate = useNavigate();
+  const [error, setError] = useState({ isActive: false, message: "" });
 
   const uploadVideoMutation = useMutation({
     mutationFn: (video: Partial<IVideo>) => postVideo(video),
     onSuccess: (res) => {
       navigate(`/${res.data._id}`);
+    },
+    onError: (error) => {
+      setError({ isActive: true, message: "Error to publish video" });
+      console.log("error", error);
+
     }
   });
 
@@ -50,7 +57,6 @@ export function AddVideoPage() {
       videoUrl: videoURL,
       imgUrl: imgURL
     });
-
   };
 
   useEffect(() => {
@@ -178,14 +184,14 @@ export function AddVideoPage() {
           </Box>
           <TextField
             id="title"
-            placeholder="Inserisci titolo"
+            placeholder="Insert title"
             fullWidth
             margin="normal"
             onChange={e => setTitle(e.target.value)}
           />
           <TextField
             id="description"
-            placeholder="Inserisci descrizione"
+            placeholder="Insert description"
             multiline
             maxRows={4}
             fullWidth
@@ -203,6 +209,8 @@ export function AddVideoPage() {
           </Button>
         </Box>
       </Box>
+
+      <AlertMessage error={error} setError={setError}></AlertMessage>
     </Container>
   );
 }
