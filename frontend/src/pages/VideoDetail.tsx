@@ -90,9 +90,10 @@ function VideoDetail() {
 
   const handleBufferEnd = () => {
     const bufferingTimeEnd = Date.now()
-    bufferingTimeRef.current = bufferingTimeEnd - bufferingTimeRef.current
-
-    updateRebufferingTimeMutation.mutate(bufferingTimeRef.current) // to go when left component
+    if (bufferingTimeRef.current) {
+      bufferingTimeRef.current = bufferingTimeEnd - bufferingTimeRef.current
+      updateRebufferingTimeMutation.mutate(bufferingTimeRef.current) // to go when left component
+    }
     console.log("Rebuffering time: ", bufferingTimeRef.current)
     console.log("Result of format of rebuffering:",  millisToMinutesAndSeconds( bufferingTimeRef.current))
   };
