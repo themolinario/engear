@@ -7,27 +7,19 @@ import { useEffect, useState } from "react";
 import BasicTable from "./components/BasicTable.tsx";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
+import { useAtomValue, useSetAtom } from "jotai";
+import { metricsAtom } from "../../atoms/metricsAtom.ts";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-
-const INIT_VALUE = {
-  ip: "N.N.",
-  userAgent: "N.N.",
-  streamedTime: "N.N.",
-  rebufferingEvents: "N.N.",
-  rebufferingTime: "N.N.",
-  speedTest: "N.N."
-};
-
 export function MetricsPage() {
-  const [metrics, setMetrics] = useState(INIT_VALUE);
+  const metrics = useAtomValue(metricsAtom);
+  const setMetrics = useSetAtom(metricsAtom);
   const [loading, setLoading] = useState(true);
 
   const queryClient = useQueryClient();
 
   useEffect(() => {
-
     const fetchData = async () => {
       const [ipResult, userAgentResult, userResult, speedTestResult] = await Promise.all([
         queryClient.fetchQuery(["ip"], getIPAddres),
@@ -35,8 +27,6 @@ export function MetricsPage() {
         queryClient.fetchQuery(["user"], getCurrentUser),
         queryClient.fetchQuery(["speedTest"], getSpeedTest)
       ]);
-
-
 
       setMetrics({
         ip: ipResult.data.ip ?? "N.D.",

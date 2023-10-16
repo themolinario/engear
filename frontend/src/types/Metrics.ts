@@ -27,3 +27,13 @@ export interface IUserAgent {
         "versionMajor": string
     }
 }
+
+export interface IMetrics {
+    ip: string,
+    userAgent: string,
+    streamedTime: string,
+    rebufferingEvents: string,
+    rebufferingTime: string,
+    speedTest: string,
+
+}

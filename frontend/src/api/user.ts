@@ -1,10 +1,11 @@
 import axios from "axios";
+import { IUser } from "../types/User.ts";
 
 const baseURL = "http://localhost:80/api";
 const headers = { Authorization: `Bearer ${window.sessionStorage.getItem("token")}` };
 
 export function updateStreamedTimeByUser(playedSeconds: number) {
-  return axios.put(`users/streamedTimeTotal`, { playedSeconds: playedSeconds }, { baseURL, headers });
+  return axios.put<IUser>(`users/streamedTimeTotal`, { playedSeconds: playedSeconds }, { baseURL, headers });
 }
 
 export function getCurrentUser() {

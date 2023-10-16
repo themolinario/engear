@@ -7,6 +7,8 @@ import { OnProgressProps } from "react-player/base";
 import { formatTime, millisToMinutesAndSeconds } from "../utils/utils.ts";
 import { useEffect, useRef, useState } from "react";
 import { updateRebufferingEvents, updateRebufferingTime, updateStreamedTimeByUser } from "../api/user.ts";
+import { useSetAtom } from "jotai";
+import { metricsAtom } from "../atoms/metricsAtom.ts";
 
 function VideoDetail() {
   const { videoId } = useParams();
@@ -14,7 +16,8 @@ function VideoDetail() {
   const playedSecondsRef = useRef(0);
   const playedSecondsByUserRef = useRef(0);
   const [views, setViews] = useState(0);
-  const bufferingTimeRef = useRef(0)
+  const bufferingTimeRef = useRef(0);
+  const setMetrics = useSetAtom(metricsAtom);
 
   const { data: video, isLoading } = useQuery({
     queryKey: [videoId],
@@ -24,7 +27,11 @@ function VideoDetail() {
 
   const updateViewsMutation = useMutation({ mutationFn: addView });
   const updateStreamedTimeTotalMutation = useMutation({ mutationFn: updateStreamedTimeTotal });
-  const updateStreamedTimeByUserMutation = useMutation({ mutationFn: updateStreamedTimeByUser });
+  const updateStreamedTimeByUserMutation = useMutation(
+    {
+      mutationFn: updateStreamedTimeByUser,
+      onSuccess: (res) => setMetrics(prev => ({...prev, streamedTime: res.data.totalStreamedTime.toString()}))
+    });
   const updateRebufferingEventsMutation = useMutation({ mutationFn: updateRebufferingEvents });
   const updateRebufferingTimeMutation = useMutation({mutationFn: updateRebufferingTime})
 
