@@ -5,10 +5,11 @@ import { getCurrentUser, getSpeedTest } from "../../api/user.ts";
 import { formatTime, millisToMinutesAndSeconds } from "../../utils/utils.ts";
 import { useEffect, useState } from "react";
 import BasicTable from "./components/BasicTable.tsx";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-import { Doughnut } from 'react-chartjs-2';
-import { useAtomValue, useSetAtom } from "jotai";
-import { metricsAtom } from "../../atoms/metricsAtom.ts";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { Doughnut } from "react-chartjs-2";
+import { useAtomValue } from "jotai";
+import { metricUserAtom } from "../../atoms/metricsAtom.ts";
+import { IMetric } from "../../types/Metrics.ts";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -22,9 +23,18 @@ const HEADER = [
   "Speed test"
 ];
 
+const INIT_METRICS: IMetric = {
+  ip: "N.N.",
+  userAgent: "N.N.",
+  speedTest: "N.N.",
+  streamedTime: 0,
+  rebufferingEvents: "N.N.",
+  rebufferingTime: 0
+};
+
 export function MetricsPage() {
-  const metrics = useAtomValue(metricsAtom);
-  const setMetrics = useSetAtom(metricsAtom);
+  const metricsUser = useAtomValue(metricUserAtom);
+  const [metrics, setMetrics] = useState(INIT_METRICS);
   const [loading, setLoading] = useState(true);
 
   const queryClient = useQueryClient();
@@ -41,11 +51,12 @@ export function MetricsPage() {
       setMetrics({
         ip: ipResult.data.ip ?? "N.D.",
         userAgent: userAgentResult.data.name ?? "N.D",
-        streamedTime: formatTime(userResult.data?.streamedTimeTotal),
+        speedTest: speedTestResult.data?.downloadSpeed?.toFixed(2)?.concat(" MB"),
+        streamedTime: userResult.data?.streamedTimeTotal,
         rebufferingEvents: userResult.data?.rebufferingEvents,
-        rebufferingTime: millisToMinutesAndSeconds(userResult.data?.rebufferingTime),
-        speedTest: speedTestResult.data?.downloadSpeed?.toFixed(2)?.concat(" MB")
+        rebufferingTime: userResult.data?.rebufferingTime
       });
+
 
     };
 
@@ -70,7 +81,7 @@ export function MetricsPage() {
       screenSize: string,
       speedTest: string
     ) => {
-      return { ip, userAgent,  streamedTime, rebufferingEvents, rebufferingTime, screenSize, speedTest };
+      return { ip, userAgent, streamedTime, rebufferingEvents, rebufferingTime, screenSize, speedTest };
     };
 
 
@@ -78,9 +89,9 @@ export function MetricsPage() {
     createData(
       metrics.ip,
       metrics.userAgent,
-      metrics.streamedTime,
-      metrics.rebufferingEvents,
-      metrics.rebufferingTime,
+      formatTime(metricsUser.streamedTime ? metricsUser.streamedTime : metrics.streamedTime),
+      metricsUser.rebufferingEvents != "N.N." ? metricsUser.rebufferingEvents : metrics.rebufferingEvents,
+      millisToMinutesAndSeconds(metricsUser.rebufferingTime ? metricsUser.rebufferingTime : metrics.rebufferingTime),
       getScreenSize(),
       metrics.speedTest
     )
@@ -93,46 +104,37 @@ export function MetricsPage() {
         label: "Download rate",
         data: [metrics.speedTest && Number(metrics.speedTest.substring(0, metrics.speedTest.length - 3))],
         backgroundColor: [
-          'rgba(255, 99, 132, 0.2)',
-          'rgba(54, 162, 235, 0.2)',
-          'rgba(255, 206, 86, 0.2)',
-          'rgba(75, 192, 192, 0.2)',
-          'rgba(153, 102, 255, 0.2)',
-          'rgba(255, 159, 64, 0.2)',
+          "rgba(255, 99, 132, 0.2)",
+          "rgba(54, 162, 235, 0.2)",
+          "rgba(255, 206, 86, 0.2)",
+          "rgba(75, 192, 192, 0.2)",
+          "rgba(153, 102, 255, 0.2)",
+          "rgba(255, 159, 64, 0.2)"
         ],
         borderColor: [
-          'rgba(255, 99, 132, 1)',
-          'rgba(54, 162, 235, 1)',
-          'rgba(255, 206, 86, 1)',
-          'rgba(75, 192, 192, 1)',
-          'rgba(153, 102, 255, 1)',
-          'rgba(255, 159, 64, 1)',
+          "rgba(255, 99, 132, 1)",
+          "rgba(54, 162, 235, 1)",
+          "rgba(255, 206, 86, 1)",
+          "rgba(75, 192, 192, 1)",
+          "rgba(153, 102, 255, 1)",
+          "rgba(255, 159, 64, 1)"
         ],
-        borderWidth: 1,
+        borderWidth: 1
       }
-    ],
+    ]
 
-  }
+  };
 
   if (loading) return <PageLoader />;
 
   return (
     <>
       <BasicTable header={HEADER} rows={rows}></BasicTable>
-      <div style={{width: 500}}>
+      <div style={{ width: 500 }}>
         <Doughnut data={metricsData} />
       </div>
 
     </>
 
-    // <div>
-    //   <h1>Your IP Address is: {metrics.ip}</h1>
-    //   <h1>Your User Agent is: {metrics.userAgent}</h1>
-    //   <h1>Total Streamed time: {metrics.currentUser}</h1>
-    //   <h1>Rebuffering events: {metrics.rebufferingEvents}</h1>
-    //   <h1>Rebuffering time: {metrics.rebufferingTime}</h1>
-    //   <h1>Screen size: {getScreenSize()}</h1>
-    //   <h1>Download rate: {metrics.speedTest}</h1>
-    // </div>
   );
 }

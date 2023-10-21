@@ -28,12 +28,17 @@ export interface IUserAgent {
     }
 }
 
-export interface IMetrics {
+export interface IMetricUser {
+    streamedTime: number,
+    rebufferingEvents: string,
+    rebufferingTime: number,
+}
+
+export interface IMetric {
     ip: string,
     userAgent: string,
-    streamedTime: string,
-    rebufferingEvents: string,
-    rebufferingTime: string,
     speedTest: string,
-
+    streamedTime: number,
+    rebufferingEvents: string,
+    rebufferingTime: number,
 }

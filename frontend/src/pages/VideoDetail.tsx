@@ -8,7 +8,8 @@ import { formatTime, millisToMinutesAndSeconds } from "../utils/utils.ts";
 import { useEffect, useRef, useState } from "react";
 import { updateRebufferingEvents, updateRebufferingTime, updateStreamedTimeByUser } from "../api/user.ts";
 import { useSetAtom } from "jotai";
-import { metricsAtom } from "../atoms/metricsAtom.ts";
+import { metricUserAtom } from "../atoms/metricsAtom.ts";
+import { IMetricUser } from "../types/Metrics.ts";
 
 function VideoDetail() {
   const { videoId } = useParams();
@@ -17,7 +18,7 @@ function VideoDetail() {
   const playedSecondsByUserRef = useRef(0);
   const [views, setViews] = useState(0);
   const bufferingTimeRef = useRef(0);
-  const setMetrics = useSetAtom(metricsAtom);
+  const setMetrics = useSetAtom(metricUserAtom);
 
   const { data: video, isLoading } = useQuery({
     queryKey: [videoId],
@@ -26,14 +27,15 @@ function VideoDetail() {
   });
 
   const updateViewsMutation = useMutation({ mutationFn: addView });
-  const updateStreamedTimeTotalMutation = useMutation({ mutationFn: updateStreamedTimeTotal });
+  const updateStreamedTimeByVideoMutation = useMutation({ mutationFn: updateStreamedTimeTotal });
   const updateStreamedTimeByUserMutation = useMutation(
     {
       mutationFn: updateStreamedTimeByUser,
-      onSuccess: (res) => setMetrics(prev => ({...prev, streamedTime: res.data.totalStreamedTime.toString()}))
+      onSuccess: (res) =>
+        setMetrics((prev: IMetricUser) => ({ ...prev, streamedTime: res.data?.streamedTimeTotal }))
     });
   const updateRebufferingEventsMutation = useMutation({ mutationFn: updateRebufferingEvents });
-  const updateRebufferingTimeMutation = useMutation({mutationFn: updateRebufferingTime})
+  const updateRebufferingTimeMutation = useMutation({ mutationFn: updateRebufferingTime });
 
   useEffect(() => {
     if (!isLoading) {
@@ -66,7 +68,7 @@ function VideoDetail() {
 
   const updateStreamedTime = () => {
     if (playedSecondsRef.current) {
-      updateStreamedTimeTotalMutation.mutate({ id: videoId, playedSeconds: playedSecondsRef.current });
+      updateStreamedTimeByVideoMutation.mutate({ id: videoId, playedSeconds: playedSecondsRef.current });
       console.log("unmount update", playedSecondsRef.current);
     }
 
@@ -90,19 +92,19 @@ function VideoDetail() {
   // Gestire il numero di rebuffering per tutta l'applicazione
 
   const handleBuffer = () => {
-    console.log("buffer events triggered")
-    bufferingTimeRef.current = Date.now()
-    updateRebufferingEventsMutation.mutate()
+    console.log("buffer events triggered");
+    bufferingTimeRef.current = Date.now();
+    updateRebufferingEventsMutation.mutate();
   };
 
   const handleBufferEnd = () => {
-    const bufferingTimeEnd = Date.now()
+    const bufferingTimeEnd = Date.now();
     if (bufferingTimeRef.current) {
-      bufferingTimeRef.current = bufferingTimeEnd - bufferingTimeRef.current
-      updateRebufferingTimeMutation.mutate(bufferingTimeRef.current) // to go when left component
+      bufferingTimeRef.current = bufferingTimeEnd - bufferingTimeRef.current;
+      updateRebufferingTimeMutation.mutate(bufferingTimeRef.current); // to go when left component
     }
-    console.log("Rebuffering time: ", bufferingTimeRef.current)
-    console.log("Result of format of rebuffering:",  millisToMinutesAndSeconds( bufferingTimeRef.current))
+    console.log("Rebuffering time: ", bufferingTimeRef.current);
+    console.log("Result of format of rebuffering:", millisToMinutesAndSeconds(bufferingTimeRef.current));
   };
 
 
