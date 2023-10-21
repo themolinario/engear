@@ -16,17 +16,23 @@ function VideoDetail() {
   const [playedSeconds, setPlayedSeconds] = useState(0);
   const playedSecondsRef = useRef(0);
   const playedSecondsByUserRef = useRef(0);
-  const [views, setViews] = useState(0);
   const bufferingTimeRef = useRef(0);
   const setMetrics = useSetAtom(metricUserAtom);
 
-  const { data: video, isLoading } = useQuery({
-    queryKey: [videoId],
-    queryFn: () => findVideoById(videoId || ""),
-    cacheTime: 0
-  });
+  const queryOptions = { refetchOnWindowFocus: false };
 
   const updateViewsMutation = useMutation({ mutationFn: addView });
+  const { data: datVideo, isLoading } = useQuery({
+    queryKey: [videoId],
+    queryFn: () => findVideoById(videoId || ""),
+    onSuccess: () => {
+      updateViewsMutation.mutate(videoId);
+    },
+    cacheTime: 0,
+    ...queryOptions
+  });
+
+
   const updateStreamedTimeByVideoMutation = useMutation({ mutationFn: updateStreamedTimeTotal });
   const updateStreamedTimeByUserMutation = useMutation(
     {
@@ -39,10 +45,7 @@ function VideoDetail() {
 
   useEffect(() => {
     if (!isLoading) {
-      console.log("isLoading", isLoading);
-      updateViewsMutation.mutate(videoId);
-      setViews(((video?.data?.views) ?? 0) + 1);
-      setPlayedSeconds(video?.data?.streamedTimeTotal ?? 0);
+      setPlayedSeconds(datVideo?.data?.streamedTimeTotal ?? 0);
     }
   }, [isLoading]);
 
@@ -112,18 +115,18 @@ function VideoDetail() {
 
   return (
     <div>
-      <h1>{video?.data.title}</h1>
+      <h1>{datVideo?.data.title}</h1>
       <div style={{ width: "100%", height: 500, position: "relative" }}>
         <ReactPlayer
           width={"100%"}
           height="100%"
-          url={video?.data.videoUrl}
+          url={datVideo?.data.videoUrl}
           onProgress={handleProgress}
           onBuffer={handleBuffer}
           onBufferEnd={handleBufferEnd}
           controls />
       </div>
-      <h2>Views: {views}</h2>
+      <h2>Views: {datVideo?.data.views}</h2>
       <h2>Streamed time total: {formatTime(playedSeconds)}</h2>
     </div>
   );
