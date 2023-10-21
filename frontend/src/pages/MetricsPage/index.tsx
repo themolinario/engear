@@ -15,6 +15,16 @@ const INIT_VALUE = {
   speedTest: "N.N."
 };
 
+const HEADER = [
+  "IP",
+  "User agent",
+  "Streamed time",
+  "Rebuffering events",
+  "Rebuffering time",
+  "Screen size",
+  "Speed test"
+];
+
 export function MetricsPage() {
   const [metrics, setMetrics] = useState(INIT_VALUE);
   const [loading, setLoading] = useState(true);
@@ -24,7 +34,12 @@ export function MetricsPage() {
   useEffect(() => {
 
     const fetchData = async () => {
-      const [ipResult, userAgentResult, userResult, speedTestResult] = await Promise.all([
+      const [
+        ipResult,
+        userAgentResult,
+        userResult,
+        speedTestResult
+      ] = await Promise.all([
         queryClient.fetchQuery(["ip"], getIPAddres),
         queryClient.fetchQuery(["userAgent"], getUserAgent),
         queryClient.fetchQuery(["user"], getCurrentUser),
@@ -45,7 +60,7 @@ export function MetricsPage() {
     fetchData().then(() => setLoading(false));
 
 
-  }, [queryClient]);
+  }, []);
 
   const getScreenSize = () => {
     const width = window.screen.width.toString();
@@ -63,7 +78,7 @@ export function MetricsPage() {
       screenSize: string,
       speedTest: string
     ) => {
-      return { ip, userAgent,  streamedTime, rebufferingEvents, rebufferingTime, screenSize, speedTest };
+      return { ip, userAgent, streamedTime, rebufferingEvents, rebufferingTime, screenSize, speedTest };
     };
 
 
@@ -79,29 +94,9 @@ export function MetricsPage() {
     )
   ];
 
-  const header = [
-    "IP",
-    "User agent",
-    "Streamed time",
-    "Rebuffering events",
-    "Rebuffering time",
-    "Screen size",
-    "Speed test"
-  ];
-
-
   if (loading) return <PageLoader />;
 
   return (
-    <BasicTable header={header} rows={rows}></BasicTable>
-    // <div>
-    //   <h1>Your IP Address is: {metrics.ip}</h1>
-    //   <h1>Your User Agent is: {metrics.userAgent}</h1>
-    //   <h1>Total Streamed time: {metrics.currentUser}</h1>
-    //   <h1>Rebuffering events: {metrics.rebufferingEvents}</h1>
-    //   <h1>Rebuffering time: {metrics.rebufferingTime}</h1>
-    //   <h1>Screen size: {getScreenSize()}</h1>
-    //   <h1>Download rate: {metrics.speedTest}</h1>
-    // </div>
+    <BasicTable header={HEADER} rows={rows}></BasicTable>
   );
 }
