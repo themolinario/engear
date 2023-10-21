@@ -7,11 +7,12 @@ import { formatTime, millisToMinutesAndSeconds } from "../../utils/utils.ts";
 // import { useEffect, useState } from "react";
 // import BasicTable from "./components/BasicTable.tsx";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-// import { Doughnut } from "react-chartjs-2";
+import { Doughnut } from "react-chartjs-2";
 import { useAtomValue } from "jotai";
 import { metricUserAtom } from "../../atoms/metricsAtom.ts";
 import { getCurrentUser, getSpeedTest } from "../../api/user.ts";
 import BasicTable from "./components/BasicTable.tsx";
+// import { Graphs } from "./components/Graphs.tsx";
 // import { IMetric } from "../../types/Metrics.ts";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -75,41 +76,43 @@ export function MetricsPage() {
       { value: dataSpeedTest?.data?.downloadSpeed.toFixed(2)?.concat(" MB") }]
   ];
 
-  // const metricsData = {
-  //   labels: ["Download Rate"],
-  //   datasets: [
-  //     {
-  //       label: "Download rate",
-  //       data: [dataSpeedTest?.data?.downloadSpeed && Number(dataSpeedTest?.data?.downloadSpeed?.toString().substring(0, dataSpeedTest?.data?.downloadSpeed?.length - 3))],
-  //       backgroundColor: [
-  //         "rgba(255, 99, 132, 0.2)",
-  //         "rgba(54, 162, 235, 0.2)",
-  //         "rgba(255, 206, 86, 0.2)",
-  //         "rgba(75, 192, 192, 0.2)",
-  //         "rgba(153, 102, 255, 0.2)",
-  //         "rgba(255, 159, 64, 0.2)"
-  //       ],
-  //       borderColor: [
-  //         "rgba(255, 99, 132, 1)",
-  //         "rgba(54, 162, 235, 1)",
-  //         "rgba(255, 206, 86, 1)",
-  //         "rgba(75, 192, 192, 1)",
-  //         "rgba(153, 102, 255, 1)",
-  //         "rgba(255, 159, 64, 1)"
-  //       ],
-  //       borderWidth: 1
-  //     }
-  //   ]
-  //
-  // };
+  const metricsData = {
+    labels: ["Download Rate"],
+    datasets: [
+      {
+        label: "Download rate",
+        data: [dataSpeedTest?.data?.downloadSpeed],
+        backgroundColor: [
+          "rgba(255, 99, 132, 0.2)",
+          "rgba(54, 162, 235, 0.2)",
+          "rgba(255, 206, 86, 0.2)",
+          "rgba(75, 192, 192, 0.2)",
+          "rgba(153, 102, 255, 0.2)",
+          "rgba(255, 159, 64, 0.2)"
+        ],
+        borderColor: [
+          "rgba(255, 99, 132, 1)",
+          "rgba(54, 162, 235, 1)",
+          "rgba(255, 206, 86, 1)",
+          "rgba(75, 192, 192, 1)",
+          "rgba(153, 102, 255, 1)",
+          "rgba(255, 159, 64, 1)"
+        ],
+        borderWidth: 1
+      }
+    ]
+
+  };
 
   if (isIpLoading || isUserAgentLoading || isSpeedTestLoading || isUserLoading) return <PageLoader />;
 
   return (
     <>
       <BasicTable header={METRIC_HEADER} rows={rows}></BasicTable>
+
+
       <div style={{ width: 500 }}>
-        {/*<Doughnut data={metricsData} />*/}
+        <Doughnut data={metricsData} />
       </div>
 
     </>
