@@ -12,6 +12,16 @@ import { metricsAtom } from "../../atoms/metricsAtom.ts";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
+const HEADER = [
+  "IP",
+  "User agent",
+  "Streamed time",
+  "Rebuffering events",
+  "Rebuffering time",
+  "Screen size",
+  "Speed test"
+];
+
 export function MetricsPage() {
   const metrics = useAtomValue(metricsAtom);
   const setMetrics = useSetAtom(metricsAtom);
@@ -76,16 +86,6 @@ export function MetricsPage() {
     )
   ];
 
-  const header = [
-    "IP",
-    "User agent",
-    "Streamed time",
-    "Rebuffering events",
-    "Rebuffering time",
-    "Screen size",
-    "Speed test"
-  ];
-
   const metricsData = {
     labels: ["Download Rate"],
     datasets: [
@@ -118,7 +118,7 @@ export function MetricsPage() {
 
   return (
     <>
-      <BasicTable header={header} rows={rows}></BasicTable>
+      <BasicTable header={HEADER} rows={rows}></BasicTable>
       <div style={{width: 500}}>
         <Doughnut data={metricsData} />
       </div>
