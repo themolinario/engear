@@ -29,7 +29,7 @@ export interface IUserAgent {
 }
 
 export interface IMetricUser {
-    streamedTime: number,
+    streamedTimeTotal: number,
     rebufferingEvents: string,
     rebufferingTime: number,
 }
@@ -41,4 +41,9 @@ export interface IMetric {
     streamedTime: number,
     rebufferingEvents: string,
     rebufferingTime: number,
+}
+
+export interface IRow {
+    value: string,
+    tooltip?: string
 }

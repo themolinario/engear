@@ -32,7 +32,7 @@ function VideoDetail() {
     {
       mutationFn: updateStreamedTimeByUser,
       onSuccess: (res) =>
-        setMetrics((prev: IMetricUser) => ({ ...prev, streamedTime: res.data?.streamedTimeTotal }))
+        setMetrics((prev: IMetricUser) => ({ ...prev, streamedTimeTotal: res.data?.streamedTimeTotal }))
     });
   const updateRebufferingEventsMutation = useMutation({ mutationFn: updateRebufferingEvents });
   const updateRebufferingTimeMutation = useMutation({ mutationFn: updateRebufferingTime });

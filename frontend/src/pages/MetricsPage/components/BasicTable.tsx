@@ -19,25 +19,22 @@ export default function BasicTable({ header, rows }: { header: any, rows: any })
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row: any) => (
+          {rows.map((row: any, index: number) => (
             <TableRow
-              key={row.ip}
+              key={index}
               sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
             >
-              <TableCell component="th" scope="row" align="center">
-                {row.ip}
-              </TableCell>
-              <TableCell align="center">{row.userAgent}</TableCell>
-              <Tooltip title="HH:MM:SS">
-                <TableCell align="center">{row.streamedTime}</TableCell>
-              </Tooltip>
-              <TableCell align="center">{row.rebufferingEvents}</TableCell>
-              <Tooltip title="MM:SS">
-                <TableCell align="center">{row.rebufferingTime}</TableCell>
-              </Tooltip>
-              <TableCell align="center">{row.screenSize}</TableCell>
-              <TableCell align="center">{row.speedTest}</TableCell>
-
+              {row.map((cell: any, cellIndex: number) => (
+                <TableCell component="th" scope="row" align="center" key={cellIndex}>
+                  {cell.tooltipTitle ? (
+                    <Tooltip title={cell.tooltipTitle}>
+                      {cell.value}
+                    </Tooltip>
+                  ) : (
+                    cell.value
+                  )}
+                </TableCell>
+              ))}
             </TableRow>
           ))}
         </TableBody>
