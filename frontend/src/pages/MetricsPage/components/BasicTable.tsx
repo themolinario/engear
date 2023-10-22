@@ -26,9 +26,9 @@ export default function BasicTable({ header, rows }: { header: any, rows: any })
             >
               {row.map((cell: any, cellIndex: number) => (
                 <TableCell component="th" scope="row" align="center" key={cellIndex}>
-                  {cell.tooltipTitle ? (
+                  {cell?.tooltipTitle ? (
                     <Tooltip title={cell.tooltipTitle}>
-                      {cell.value}
+                      <span>{cell.value}</span>
                     </Tooltip>
                   ) : (
                     cell.value
