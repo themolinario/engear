@@ -134,7 +134,7 @@ export const updateStreamedTimeByUser = async (req, res, next) => {
     );
 
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      return next(createError(404, "User not found!"));
     }
 
     res.status(200).json(user);
@@ -152,7 +152,7 @@ export const updateRebufferingEvents = async (req, res, next) => {
     });
 
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      return next(createError(404, "User not found!"));
     }
 
     res.status(200).json("Success");
@@ -171,7 +171,7 @@ export const updateRebufferingTime = async (req, res, next) => {
     });
 
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      return next(createError(404, "User not found!"));
     }
 
     res.status(200).json(user);
@@ -182,20 +182,19 @@ export const updateRebufferingTime = async (req, res, next) => {
 
 export const getSpeedTest = async (req, res, next) => {
   try {
-    const speedtest = new FastSpeedtest({
+    const speedTest = new FastSpeedtest({
       token: "YXNkZmFzZGxmbnNkYWZoYXNkZmhrYWxm", // required
-      // verbose: false, // default: false
-      // timeout: 10000, // default: 5000
-      // https: true, // default: true
-      // urlCount: 5, // default: 5
-      // bufferSize: 8, // default: 8
-      unit: FastSpeedtest.UNITS.Mbps, // default: Bps
+      unit: FastSpeedtest.UNITS.Mbps,
     });
 
-    const speed = await speedtest.getSpeed();
-    res.json({downloadSpeed: speed});
+    const downloadSpeed = await speedTest.getSpeed();
+
+    if (!downloadSpeed) {
+      return next(createError(500, "Error during speed test!"));
+    }
+
+    res.json({ downloadSpeed: downloadSpeed });
   } catch (error) {
-    console.log(`Error during speed test: ${error}`);
-    res.status(500).json({ error: "Error during speed test" });
+    next(error);
   }
 };

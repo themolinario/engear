@@ -37,7 +37,7 @@ router.put("/streamedTimeTotal", verifyToken, updateStreamedTimeByUser);
 
 router.put("/rebufferingEvents", verifyToken, updateRebufferingEvents);
 
-router.put("/updateRebufferingTime", verifyToken, updateRebufferingTime);
+router.put("/rebufferingTime", verifyToken, updateRebufferingTime);
 
 router.get("/speedTest", getSpeedTest);
 
