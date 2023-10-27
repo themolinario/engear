@@ -5,5 +5,6 @@ export interface IUser {
     password: string;
     subscribers: number;
     subscribedUsers: IUser[],
-    totalStreamedTime: number
+    totalStreamedTime: number,
+    roles: string[]
 }

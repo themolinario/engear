@@ -25,13 +25,14 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
-import {useState} from "react";
+import { useEffect, useState } from "react";
 import {useNavigate} from "react-router-dom";
 import {useMutation} from "@tanstack/react-query";
 import {getVideosByQuery} from "../../api/videos.ts";
-import {useSetAtom} from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import {videosAtom} from "../../atoms/videosAtom.ts";
 import {logout} from "../../api/logout.ts";
+import { userAtom } from "../../atoms/userAtom.ts";
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -153,6 +154,8 @@ export default function NavBar() {
     const [search, setSearch] = useState("");
     const [open, setOpen] = useState(false);
     const navigate = useNavigate();
+    const [menuItems, setMenuItems] = useState<string[]>([])
+    const userData = useAtomValue(userAtom);
 
     const setVideos = useSetAtom(videosAtom);
 
@@ -169,7 +172,15 @@ export default function NavBar() {
         onSuccess: (res) => {
             setVideos(res.data)
         }
-    })
+    });
+
+    useEffect(() => {
+        if (userData.roles.find(r => r === "root")){
+            setMenuItems(["General Metrics"]);
+        } else if (userData.roles.find(r => r === "standard")) {
+            setMenuItems(["Dashboard", "Metrics"])
+        }
+    }, []);
 
     return (
         <Box sx={{ display: 'flex' }}>
@@ -254,7 +265,7 @@ export default function NavBar() {
                 </List>
                 <Divider />
                 <List>
-                    {['Dashboard', 'Metrics'].map((text, index) => (
+                    {menuItems.map((text, index) => (
                         <ListItem key={text} disablePadding sx={{ display: 'block' }}>
                             <ListItemButton
                                 sx={{
@@ -262,7 +273,7 @@ export default function NavBar() {
                                     justifyContent: open ? 'initial' : 'center',
                                     px: 2.5,
                                 }}
-                                onClick={() => text === "Dashboard" ? navigate("/home") : text === "Metrics" ? navigate("/metrics") : navigate("/")}
+                                onClick={() => text === "Dashboard" ? navigate("/home") : text === "Metrics" ? navigate("/metrics") : text === "General Metrics" ? navigate("/general-metrics"): navigate("/") }
                             >
                                 <ListItemIcon
                                     sx={{

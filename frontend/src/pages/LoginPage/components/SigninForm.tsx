@@ -13,16 +13,20 @@ import {useMutation} from "@tanstack/react-query";
 import {signIn} from "../../../api/login.ts";
 import {useNavigate} from "react-router-dom";
 import axios from "axios";
+import { useSetAtom } from "jotai";
+import { userAtom } from "../../../atoms/userAtom.ts";
 
 export function SigninForm() {
     const navigate = useNavigate();
     const [error, setError] = useState(false);
+    const setUser = useSetAtom(userAtom);
 
     const {mutate: signinMutation} = useMutation({
         mutationFn: ({name, password} : {name: string, password: string}) => signIn(name || "", password || ""),
         onSuccess: (res) => {
             axios.defaults.headers.common.Authorization = `Bearer ${res.data.token}`;
             sessionStorage.setItem("token", res.data.token);
+            setUser(res.data.user);
             navigate("/home");
         },
         onError: () => {

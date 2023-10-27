@@ -6,6 +6,7 @@ import {LoginPage} from "./pages/LoginPage";
 import Home from "./pages/HomePage";
 import {SignUpPage} from "./pages/SignUpPage";
 import {MetricsPage} from "./pages/MetricsPage";
+import { GeneralMetricsPage } from "./pages/GeneralMetricsPage";
 
 export const router = createBrowserRouter([
     {
@@ -38,6 +39,10 @@ export const router = createBrowserRouter([
             {
                 path: "/metrics",
                 element: <MetricsPage />
+            },
+            {
+                path: "/general-metrics",
+                element: <GeneralMetricsPage />
             }
         ]
     }
