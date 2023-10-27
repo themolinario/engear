@@ -1,40 +1,40 @@
 import mongoose from "mongoose";
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
-import {createError} from "../error.js";
+import { createError } from "../error.js";
 import jwt from "jsonwebtoken";
 
-
 export const signup = async (req, res, next) => {
-    try {
-        const salt = bcrypt.genSaltSync(10);
-        const hash = bcrypt.hashSync(req.body.password, salt);
-        const newUser = new User({...req.body, password: hash});
+  try {
+    const salt = bcrypt.genSaltSync(10);
+    const hash = bcrypt.hashSync(req.body.password, salt);
+    const newUser = new User({
+      ...req.body,
+      password: hash,
+      roles: ["standard"],
+    });
 
-        await newUser.save();
-        res.status(200).send("User created successfully");
-    } catch (err) {
-        next(err);
-    }
-}
+    await newUser.save();
+    res.status(200).send("User created successfully");
+  } catch (err) {
+    next(err);
+  }
+};
 
 export const signin = async (req, res, next) => {
-    try {
-        const user = await User.findOne({name: req.body.name});
-        if (!user) return next(createError(404, "User not found"));
+  try {
+    const user = await User.findOne({ name: req.body.name });
+    if (!user) return next(createError(404, "User not found"));
+    const isCorrect = bcrypt.compareSync(req.body.password, user.password);
+    if (!isCorrect) return next(createError(400, "Incorrect password"));
 
-        const isCorrect = bcrypt.compareSync(req.body.password, user.password);
-        if (!isCorrect) return next(createError(400, "Incorrect password"));
+    const token = jwt.sign({ id: user._id }, process.env.JWT);
 
-        const token = jwt.sign({id: user._id}, process.env.JWT);
-
-
-
-        res.status(200)
-            .json({
-                token
-            });
-    } catch (err) {
-        next(err);
-    }
-}
+    res.status(200).json({
+      token,
+      user,
+    });
+  } catch (err) {
+    next(err);
+  }
+};

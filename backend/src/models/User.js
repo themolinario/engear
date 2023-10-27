@@ -28,16 +28,21 @@ const UserSchema = new mongoose.Schema(
     },
     streamedTimeTotal: {
       type: Number,
-      default: 0
+      default: 0,
     },
     rebufferingEvents: {
       type: Number,
-      default: 0
+      default: 0,
     },
     rebufferingTime: {
       type: Number,
-      default: 0
-    }
+      default: 0,
+    },
+    roles: [
+      {
+        type: String,
+      },
+    ],
   },
   { timestamps: true },
 );

