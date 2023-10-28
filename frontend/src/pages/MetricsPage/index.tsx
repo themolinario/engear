@@ -1,19 +1,13 @@
-// import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getIPAddres, getUserAgent } from "../../api/metrics.ts";
 import { useQuery } from "@tanstack/react-query";
 import { PageLoader } from "../../components/basic/PageLoader.tsx";
-// import { getCurrentUser, getSpeedTest } from "../../api/user.ts";
 import { formatTime, millisToMinutesAndSeconds } from "../../utils/utils.ts";
-// import { useEffect, useState } from "react";
-// import BasicTable from "./components/BasicTable.tsx";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Doughnut } from "react-chartjs-2";
 import { useAtomValue } from "jotai";
 import { metricUserAtom } from "../../atoms/metricsAtom.ts";
 import { getCurrentUser, getSpeedTest } from "../../api/user.ts";
 import BasicTable from "./components/BasicTable.tsx";
-// import { Graphs } from "./components/Graphs.tsx";
-// import { IMetric } from "../../types/Metrics.ts";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -109,7 +103,6 @@ export function MetricsPage() {
   return (
     <>
       <BasicTable header={METRIC_HEADER} rows={rows}></BasicTable>
-
 
       <div style={{ width: 500 }}>
         <Doughnut data={metricsData} />
