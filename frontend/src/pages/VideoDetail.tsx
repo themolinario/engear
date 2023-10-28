@@ -4,7 +4,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { addView, findVideoById, updateStreamedTimeTotal } from "../api/videos.ts";
 import { PageLoader } from "../components/basic/PageLoader.tsx";
 import { OnProgressProps } from "react-player/base";
-import { formatTime, millisToMinutesAndSeconds } from "../utils/utils.ts";
+import { formatTime, getVideoMetadata, millisToMinutesAndSeconds } from "../utils/utils.ts";
 import { useEffect, useRef, useState } from "react";
 import { updateRebufferingEvents, updateRebufferingTime, updateStreamedTimeByUser } from "../api/user.ts";
 import { useSetAtom } from "jotai";
@@ -38,9 +38,11 @@ function VideoDetail() {
   const { data: dataVideo, isLoading } = useQuery({
     queryKey: [videoId],
     queryFn: () => findVideoById(videoId || ""),
-    onSuccess: ({ data }) => {
+    onSuccess: async ({ data }) => {
       videoMutations.updateViews.mutate(videoId);
       setPlayedSeconds(data?.streamedTimeTotal ?? 0);
+      const metadata = await getVideoMetadata(data.videoUrl);
+      console.log(metadata)
     },
     refetchOnWindowFocus: false
   });

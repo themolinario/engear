@@ -1,3 +1,4 @@
+import { getStorage, ref, getMetadata } from 'firebase/storage';
 
 export function formatTime(seconds: number) {
   if (seconds) {
@@ -13,3 +14,18 @@ export function millisToMinutesAndSeconds(millis: number) {
   let seconds = ((millis % 60000) / 1000).toFixed(0);
   return minutes + ":" + (Number(seconds) < 10 ? "0" : "") + seconds;
 }
+
+// firebaseService.js
+
+
+export const getVideoMetadata = async (videoPath: string) => {
+  const storage = getStorage();
+  const videoRef = ref(storage, videoPath);
+
+  try {
+    return await getMetadata(videoRef);
+  } catch (error) {
+    console.error('Error to retrieved matadata: ', error);
+    return null;
+  }
+};

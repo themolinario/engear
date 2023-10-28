@@ -16,7 +16,7 @@ import TextField from "@mui/material/TextField";
 import { useMutation } from "@tanstack/react-query";
 import { postVideo } from "../../api/videos.ts";
 import { IVideo } from "../../types/Video.ts";
-import { app } from "../../firebaseConfig.ts";
+import { app } from "../../config/firebaseConfig.ts";
 import { useNavigate } from "react-router-dom";
 import { LinearProgress } from "@mui/material";
 import { styled } from "@mui/material/styles";
