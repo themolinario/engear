@@ -8,5 +8,6 @@ export const metricsAtom = atom<IMetrics>({
   streamedTime: "N.N.",
   rebufferingEvents: "N.N.",
   rebufferingTime: "N.N.",
-  speedTest: "N.N."
+  speedTest: "N.N.",
+  views: 0
 })

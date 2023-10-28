@@ -1,5 +1,5 @@
-import { useQueryClient } from "@tanstack/react-query";
-import { getIPAddres, getUserAgent } from "../../api/metrics.ts";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { getIPAddres, getUserAgent, postMetrics } from "../../api/metrics.ts";
 import { PageLoader } from "../../components/basic/PageLoader.tsx";
 import { getCurrentUser, getSpeedTest } from "../../api/user.ts";
 import { formatTime, millisToMinutesAndSeconds } from "../../utils/utils.ts";
@@ -26,8 +26,13 @@ export function MetricsPage() {
   const metrics = useAtomValue(metricsAtom);
   const setMetrics = useSetAtom(metricsAtom);
   const [loading, setLoading] = useState(true);
+  const [metricsLoad, setMetricsLoad] = useState(false);
 
   const queryClient = useQueryClient();
+
+  const postMetricsMutation = useMutation({
+    mutationFn: postMetrics
+  })
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,19 +43,19 @@ export function MetricsPage() {
         queryClient.fetchQuery(["speedTest"], getSpeedTest)
       ]);
 
-      setMetrics({
+      setMetrics(prev => ({
+        ...prev,
         ip: ipResult.data.ip ?? "N.D.",
         userAgent: userAgentResult.data.name ?? "N.D",
         streamedTime: formatTime(userResult.data?.streamedTimeTotal),
         rebufferingEvents: userResult.data?.rebufferingEvents,
         rebufferingTime: millisToMinutesAndSeconds(userResult.data?.rebufferingTime),
         speedTest: speedTestResult.data?.downloadSpeed?.toFixed(2)?.concat(" MB")
-      });
+      }));
 
     };
 
     fetchData().then(() => setLoading(false));
-
 
   }, [queryClient]);
 
@@ -115,6 +120,10 @@ export function MetricsPage() {
   }
 
   if (loading) return <PageLoader />;
+  if (!loading && !metricsLoad) {
+    postMetricsMutation.mutate(metrics);
+    setMetricsLoad(true);
+  }
 
   return (
     <>

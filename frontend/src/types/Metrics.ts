@@ -35,5 +35,5 @@ export interface IMetrics {
     rebufferingEvents: string,
     rebufferingTime: string,
     speedTest: string,
-
+    views: number,
 }

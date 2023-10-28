@@ -25,7 +25,10 @@ function VideoDetail() {
     cacheTime: 0
   });
 
-  const updateViewsMutation = useMutation({ mutationFn: addView });
+  const updateViewsMutation = useMutation({
+    mutationFn: addView,
+    onSuccess: () => setMetrics(prev => ({...prev, views: views}))
+  });
   const updateStreamedTimeTotalMutation = useMutation({ mutationFn: updateStreamedTimeTotal });
   const updateStreamedTimeByUserMutation = useMutation(
     {
