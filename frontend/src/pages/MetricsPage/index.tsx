@@ -1,18 +1,18 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { getIPAddres, getUserAgent, postMetrics } from "../../api/metrics.ts";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { PageLoader } from "../../components/basic/PageLoader.tsx";
-import { getCurrentUser, getSpeedTest } from "../../api/user.ts";
 import { formatTime, millisToMinutesAndSeconds } from "../../utils/utils.ts";
-import { useEffect, useState } from "react";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { Doughnut } from "react-chartjs-2";
+import { useAtomValue } from "jotai";
+import { metricUserAtom } from "../../atoms/metricsAtom.ts";
+import { getCurrentUser, getSpeedTest } from "../../api/user.ts";
 import BasicTable from "./components/BasicTable.tsx";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-import { Doughnut } from 'react-chartjs-2';
-import { useAtomValue, useSetAtom } from "jotai";
-import { metricsAtom } from "../../atoms/metricsAtom.ts";
+import { useState } from "react";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const HEADER = [
+const METRIC_HEADER = [
   "IP",
   "User agent",
   "Streamed time",
@@ -23,41 +23,30 @@ const HEADER = [
 ];
 
 export function MetricsPage() {
-  const metrics = useAtomValue(metricsAtom);
-  const setMetrics = useSetAtom(metricsAtom);
-  const [loading, setLoading] = useState(true);
+  const metricsUser = useAtomValue(metricUserAtom);
   const [metricsLoad, setMetricsLoad] = useState(false);
 
-  const queryClient = useQueryClient();
+  const queryOptions = { refetchOnWindowFocus: false };
+  const queryMultiple = () => {
+    const ipResult = useQuery(["ip"], getIPAddres, queryOptions);
+    const userAgentResult = useQuery(["userAgent"], getUserAgent, queryOptions);
+    const userResult = useQuery(["user"], getCurrentUser, queryOptions);
+    const speedTestResult = useQuery(["speedTest"], getSpeedTest, queryOptions);
+
+    return [ipResult, userAgentResult, userResult, speedTestResult];
+  };
 
   const postMetricsMutation = useMutation({
     mutationFn: postMetrics
   })
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const [ipResult, userAgentResult, userResult, speedTestResult] = await Promise.all([
-        queryClient.fetchQuery(["ip"], getIPAddres),
-        queryClient.fetchQuery(["userAgent"], getUserAgent),
-        queryClient.fetchQuery(["user"], getCurrentUser),
-        queryClient.fetchQuery(["speedTest"], getSpeedTest)
-      ]);
+  const [
+    { isLoading: isIpLoading, data: dataIp },
+    { isLoading: isUserAgentLoading, data: dataUserAgent },
+    { isLoading: isUserLoading, data: dataUser },
+    { isLoading: isSpeedTestLoading, data: dataSpeedTest }
+  ] = queryMultiple();
 
-      setMetrics(prev => ({
-        ...prev,
-        ip: ipResult.data.ip ?? "N.D.",
-        userAgent: userAgentResult.data.name ?? "N.D",
-        streamedTime: formatTime(userResult.data?.streamedTimeTotal),
-        rebufferingEvents: userResult.data?.rebufferingEvents,
-        rebufferingTime: millisToMinutesAndSeconds(userResult.data?.rebufferingTime),
-        speedTest: speedTestResult.data?.downloadSpeed?.toFixed(2)?.concat(" MB")
-      }));
-
-    };
-
-    fetchData().then(() => setLoading(false));
-
-  }, [queryClient]);
 
   const getScreenSize = () => {
     const width = window.screen.width.toString();
@@ -65,30 +54,26 @@ export function MetricsPage() {
     return width.concat("x").concat(height);
   };
 
-  const
-    createData = (
-      ip: string,
-      userAgent: string,
-      streamedTime: string,
-      rebufferingEvents: string,
-      rebufferingTime: string,
-      screenSize: string,
-      speedTest: string
-    ) => {
-      return { ip, userAgent,  streamedTime, rebufferingEvents, rebufferingTime, screenSize, speedTest };
-    };
-
+  const getValue = (value: string) => {
+    switch (value) {
+      case "STREAMED_TIME_TOTAL":
+        return formatTime(metricsUser.streamedTimeTotal ? metricsUser.streamedTimeTotal : dataUser?.data?.streamedTimeTotal);
+      case "REBUFFERING_EVENTS":
+        return metricsUser.rebufferingEvents != "N.N." ? metricsUser.rebufferingEvents : dataUser?.data?.rebufferingEvents;
+      case "REBUFFERING_TIME":
+        return millisToMinutesAndSeconds(metricsUser.rebufferingTime ? metricsUser.rebufferingTime : dataUser?.data?.rebufferingTime);
+    }
+  };
 
   const rows = [
-    createData(
-      metrics.ip,
-      metrics.userAgent,
-      metrics.streamedTime,
-      metrics.rebufferingEvents,
-      metrics.rebufferingTime,
-      getScreenSize(),
-      metrics.speedTest
-    )
+    [
+      { value: dataIp?.data.ip },
+      { value: dataUserAgent?.data.name },
+      { value: getValue("STREAMED_TIME_TOTAL"), tooltipTitle: "HH:MM:SS" },
+      { value: getValue("REBUFFERING_EVENTS") },
+      { value: getValue("REBUFFERING_TIME"), tooltipTitle: "MM:SS" },
+      { value: getScreenSize() },
+      { value: dataSpeedTest?.data?.downloadSpeed.toFixed(2)?.concat(" MB") }]
   ];
 
   const metricsData = {
@@ -96,52 +81,44 @@ export function MetricsPage() {
     datasets: [
       {
         label: "Download rate",
-        data: [metrics.speedTest && Number(metrics.speedTest.substring(0, metrics.speedTest.length - 3))],
+        data: [dataSpeedTest?.data?.downloadSpeed],
         backgroundColor: [
-          'rgba(255, 99, 132, 0.2)',
-          'rgba(54, 162, 235, 0.2)',
-          'rgba(255, 206, 86, 0.2)',
-          'rgba(75, 192, 192, 0.2)',
-          'rgba(153, 102, 255, 0.2)',
-          'rgba(255, 159, 64, 0.2)',
+          "rgba(255, 99, 132, 0.2)",
+          "rgba(54, 162, 235, 0.2)",
+          "rgba(255, 206, 86, 0.2)",
+          "rgba(75, 192, 192, 0.2)",
+          "rgba(153, 102, 255, 0.2)",
+          "rgba(255, 159, 64, 0.2)"
         ],
         borderColor: [
-          'rgba(255, 99, 132, 1)',
-          'rgba(54, 162, 235, 1)',
-          'rgba(255, 206, 86, 1)',
-          'rgba(75, 192, 192, 1)',
-          'rgba(153, 102, 255, 1)',
-          'rgba(255, 159, 64, 1)',
+          "rgba(255, 99, 132, 1)",
+          "rgba(54, 162, 235, 1)",
+          "rgba(255, 206, 86, 1)",
+          "rgba(75, 192, 192, 1)",
+          "rgba(153, 102, 255, 1)",
+          "rgba(255, 159, 64, 1)"
         ],
-        borderWidth: 1,
+        borderWidth: 1
       }
-    ],
+    ]
 
-  }
+  };
 
-  if (loading) return <PageLoader />;
-  if (!loading && !metricsLoad) {
-    postMetricsMutation.mutate(metrics);
+  if (isIpLoading || isUserAgentLoading || isSpeedTestLoading || isUserLoading) return <PageLoader />;
+  if (!(isIpLoading || isUserAgentLoading || isSpeedTestLoading || isUserLoading) && !metricsLoad) {
+    postMetricsMutation.mutate(metricsUser);
     setMetricsLoad(true);
   }
 
   return (
     <>
-      <BasicTable header={HEADER} rows={rows}></BasicTable>
-      <div style={{width: 500}}>
+      <BasicTable header={METRIC_HEADER} rows={rows}></BasicTable>
+
+      <div style={{ width: 500 }}>
         <Doughnut data={metricsData} />
       </div>
 
     </>
 
-    // <div>
-    //   <h1>Your IP Address is: {metrics.ip}</h1>
-    //   <h1>Your User Agent is: {metrics.userAgent}</h1>
-    //   <h1>Total Streamed time: {metrics.currentUser}</h1>
-    //   <h1>Rebuffering events: {metrics.rebufferingEvents}</h1>
-    //   <h1>Rebuffering time: {metrics.rebufferingTime}</h1>
-    //   <h1>Screen size: {getScreenSize()}</h1>
-    //   <h1>Download rate: {metrics.speedTest}</h1>
-    // </div>
   );
 }
