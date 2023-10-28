@@ -85,7 +85,7 @@ export const updateStreamedTimeTotal = async (req, res, next) => {
     );
 
     if (!updatedVideo) {
-      return res.status(404).json({error: "Video not found"});
+      return next(createError(404, "Video not found!"))
     }
 
     return res.status(200).json(updatedVideo)
