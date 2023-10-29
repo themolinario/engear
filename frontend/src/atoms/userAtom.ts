@@ -9,5 +9,7 @@ export const userAtom = atom<IUser>({
   roles: [],
   subscribedUsers: [],
   subscribers: 0,
-  totalStreamedTime: 0
+  streamedTimeTotal: 0,
+  rebufferingEvents: 0,
+  rebufferingTime: 0
 })

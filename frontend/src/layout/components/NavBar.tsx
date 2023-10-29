@@ -27,12 +27,12 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import { useEffect, useState } from "react";
 import {useNavigate} from "react-router-dom";
-import {useMutation} from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import {getVideosByQuery} from "../../api/videos.ts";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useSetAtom } from "jotai";
 import {videosAtom} from "../../atoms/videosAtom.ts";
 import {logout} from "../../api/logout.ts";
-import { userAtom } from "../../atoms/userAtom.ts";
+import { getCurrentUser } from "../../api/user.ts";
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -155,7 +155,16 @@ export default function NavBar() {
     const [open, setOpen] = useState(false);
     const navigate = useNavigate();
     const [menuItems, setMenuItems] = useState<string[]>([])
-    const userData = useAtomValue(userAtom);
+    const {data: userResult} = useQuery(["user"], getCurrentUser)
+
+    useEffect(() => {
+        if (userResult?.data.roles.find((r: string) => r === "root")){
+            setMenuItems(["General Metrics"]);
+        } else if (userResult?.data.roles.find((r: string) => r === "standard")) {
+            setMenuItems(["Dashboard", "Metrics"])
+        }
+    }, [userResult]);
+
 
     const setVideos = useSetAtom(videosAtom);
 
@@ -173,14 +182,6 @@ export default function NavBar() {
             setVideos(res.data)
         }
     });
-
-    useEffect(() => {
-        if (userData.roles.find(r => r === "root")){
-            setMenuItems(["General Metrics"]);
-        } else if (userData.roles.find(r => r === "standard")) {
-            setMenuItems(["Dashboard", "Metrics"])
-        }
-    }, []);
 
     return (
         <Box sx={{ display: 'flex' }}>

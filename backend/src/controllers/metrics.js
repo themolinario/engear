@@ -2,10 +2,11 @@ import moongose from "mongoose";
 import Metrics from "../models/Metrics.js";
 
 export const addMetrics = async (req, res, next) => {
+  const { id } = req.user;
   let oldMetrics;
   try {
     oldMetrics = await Metrics.findOne({
-      userId: new moongose.Types.ObjectId(req.user.id),
+      userId: new moongose.Types.ObjectId(id),
     });
   } catch (e) {
     console.log(e);
@@ -13,7 +14,7 @@ export const addMetrics = async (req, res, next) => {
   }
 
   const newMetrics = new Metrics({
-    userId: new moongose.Types.ObjectId(req.user.id),
+    userId: new moongose.Types.ObjectId(id),
     ...req.body,
   });
 
