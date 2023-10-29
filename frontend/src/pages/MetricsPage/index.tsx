@@ -1,10 +1,9 @@
 import { getIPAddres, getUserAgent, postMetrics } from "../../api/metrics.ts";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { PageLoader } from "../../components/basic/PageLoader.tsx";
-import { formatTime, millisToMinutesAndSeconds } from "../../utils/utils.ts";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Doughnut } from "react-chartjs-2";
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { metricUserAtom } from "../../atoms/metricsAtom.ts";
 import { getCurrentUser, getSpeedTest } from "../../api/user.ts";
 import BasicTable from "./components/BasicTable.tsx";
@@ -25,6 +24,7 @@ const METRIC_HEADER = [
 export function MetricsPage() {
   const metricsUser = useAtomValue(metricUserAtom);
   const [metricsLoad, setMetricsLoad] = useState(false);
+  const setMetrics = useSetAtom(metricUserAtom);
 
   const queryOptions = { refetchOnWindowFocus: false };
   const queryMultiple = () => {
@@ -57,11 +57,11 @@ export function MetricsPage() {
   const getValue = (value: string) => {
     switch (value) {
       case "STREAMED_TIME_TOTAL":
-        return formatTime(metricsUser.streamedTimeTotal ? metricsUser.streamedTimeTotal : dataUser?.data?.streamedTimeTotal);
+        return (metricsUser.streamedTimeTotal ? metricsUser.streamedTimeTotal : dataUser?.data?.streamedTimeTotal) ;
       case "REBUFFERING_EVENTS":
         return metricsUser.rebufferingEvents != "N.N." ? metricsUser.rebufferingEvents : dataUser?.data?.rebufferingEvents;
       case "REBUFFERING_TIME":
-        return millisToMinutesAndSeconds(metricsUser.rebufferingTime ? metricsUser.rebufferingTime : dataUser?.data?.rebufferingTime);
+        return metricsUser.rebufferingTime ? metricsUser.rebufferingTime : dataUser?.data?.rebufferingTime;
     }
   };
 
@@ -106,6 +106,15 @@ export function MetricsPage() {
 
   if (isIpLoading || isUserAgentLoading || isSpeedTestLoading || isUserLoading) return <PageLoader />;
   if (!(isIpLoading || isUserAgentLoading || isSpeedTestLoading || isUserLoading) && !metricsLoad) {
+    setMetrics(
+      {
+        rebufferingEvents: getValue("REBUFFERING_EVENTS"),
+        rebufferingTime: getValue("REBUFFERING_TIME"),
+        streamedTimeTotal: getValue("STREAMED_TIME_TOTAL"),
+        userAgent: (dataUserAgent?.data.name || "") as string,
+        speedTest: (dataSpeedTest?.data?.downloadSpeed.toFixed(2)?.concat(" MB") || "") as string
+      });
+    console.log(metricsUser)
     postMetricsMutation.mutate(metricsUser);
     setMetricsLoad(true);
   }

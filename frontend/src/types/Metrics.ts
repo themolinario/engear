@@ -32,6 +32,8 @@ export interface IMetricUser {
     streamedTimeTotal: number,
     rebufferingEvents: string,
     rebufferingTime: number,
+    userAgent: string,
+    speedTest: string,
 }
 
 export interface IMetric {
@@ -41,7 +43,6 @@ export interface IMetric {
     streamedTime: number,
     rebufferingEvents: string,
     rebufferingTime: number,
-  views: number,
 }
 
 export interface IRow {

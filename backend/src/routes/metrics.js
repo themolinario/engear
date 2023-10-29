@@ -4,7 +4,7 @@ import { verifyToken } from "../verifyToken.js";
 
 const router = express.Router();
 
-router.post("/", verifyToken, addMetrics);
+router.post("/", addMetrics);
 router.get("/general", getAllMetrics);
 
 export default router;

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { IIpAddress, IMetrics, IUserAgent } from "../types/Metrics";
+import { IIpAddress, IMetricUser, IUserAgent } from "../types/Metrics";
 
 const baseURL = "http://localhost:80/api";
 const headers = { Authorization: `Bearer ${window.sessionStorage.getItem("token")}` };
@@ -16,10 +16,10 @@ export function getUserAgent () {
     return axios.get<IUserAgent>("https://api.ipgeolocation.io/user-agent?apiKey=f9292396856c40c994548c93a93fbe07")
 }
 
-export function postMetrics (metrics: Omit<IMetrics, "ip">) {
-    return axios.post<IMetrics>("metrics" , metrics, {baseURL, headers})
+export function postMetrics (metrics: IMetricUser) {
+    return axios.post<IMetricUser>("metrics" , metrics, {baseURL, headers})
 }
 
 export function getAllMetrics () {
-    return axios.get<IMetrics[]>("metrics/general", {baseURL, headers})
+    return axios.get<IMetricUser[]>("metrics/general", {baseURL, headers})
 }

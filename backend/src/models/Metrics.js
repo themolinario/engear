@@ -11,7 +11,7 @@ const MetricsSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    streamedTime: {
+    streamedTimeTotal: {
       type: String,
       required: true,
     },
@@ -26,11 +26,6 @@ const MetricsSchema = new mongoose.Schema(
     speedTest: {
       type: String,
       required: true,
-    },
-    views: {
-      type: Number,
-      required: true,
-      default: 0,
     },
   },
   { timestamps: true },
