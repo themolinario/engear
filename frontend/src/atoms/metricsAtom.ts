@@ -6,5 +6,6 @@ export const metricUserAtom = atom<IMetricUser>({
   rebufferingEvents: "N.N.",
   rebufferingTime: 0,
   userAgent: "N.N",
-  speedTest: "N.N"
+  speedTest: "N.N",
+  username: "N.N.",
 });

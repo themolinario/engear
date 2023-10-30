@@ -34,6 +34,7 @@ export interface IMetricUser {
     rebufferingTime: number,
     userAgent: string,
     speedTest: string,
+    username: string
 }
 
 export interface IMetric {

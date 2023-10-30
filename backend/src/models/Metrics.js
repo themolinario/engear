@@ -7,6 +7,10 @@ const MetricsSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    username: {
+      type: String,
+      required: true,
+    },
     userAgent: {
       type: String,
       required: true,

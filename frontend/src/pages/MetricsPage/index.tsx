@@ -2,11 +2,11 @@ import { getIPAddres, getUserAgent, postMetrics } from "../../api/metrics.ts";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { PageLoader } from "../../components/basic/PageLoader.tsx";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-import { Doughnut } from "react-chartjs-2";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtomValue } from "jotai";
 import { metricUserAtom } from "../../atoms/metricsAtom.ts";
 import { getCurrentUser, getSpeedTest } from "../../api/user.ts";
 import BasicTable from "./components/BasicTable.tsx";
+import Button from "@mui/material/Button";
 import { useState } from "react";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -23,8 +23,7 @@ const METRIC_HEADER = [
 
 export function MetricsPage() {
   const metricsUser = useAtomValue(metricUserAtom);
-  const [metricsLoad, setMetricsLoad] = useState(false);
-  const setMetrics = useSetAtom(metricUserAtom);
+  const [sentMetrics, setSentMetrics] = useState(false);
 
   const queryOptions = { refetchOnWindowFocus: false };
   const queryMultiple = () => {
@@ -76,57 +75,29 @@ export function MetricsPage() {
       { value: dataSpeedTest?.data?.downloadSpeed.toFixed(2)?.concat(" MB") }]
   ];
 
-  const metricsData = {
-    labels: ["Download Rate"],
-    datasets: [
-      {
-        label: "Download rate",
-        data: [dataSpeedTest?.data?.downloadSpeed],
-        backgroundColor: [
-          "rgba(255, 99, 132, 0.2)",
-          "rgba(54, 162, 235, 0.2)",
-          "rgba(255, 206, 86, 0.2)",
-          "rgba(75, 192, 192, 0.2)",
-          "rgba(153, 102, 255, 0.2)",
-          "rgba(255, 159, 64, 0.2)"
-        ],
-        borderColor: [
-          "rgba(255, 99, 132, 1)",
-          "rgba(54, 162, 235, 1)",
-          "rgba(255, 206, 86, 1)",
-          "rgba(75, 192, 192, 1)",
-          "rgba(153, 102, 255, 1)",
-          "rgba(255, 159, 64, 1)"
-        ],
-        borderWidth: 1
-      }
-    ]
-
-  };
-
   if (isIpLoading || isUserAgentLoading || isSpeedTestLoading || isUserLoading) return <PageLoader />;
-  if (!(isIpLoading || isUserAgentLoading || isSpeedTestLoading || isUserLoading) && !metricsLoad) {
-    setMetrics(
-      {
-        rebufferingEvents: getValue("REBUFFERING_EVENTS"),
-        rebufferingTime: getValue("REBUFFERING_TIME"),
-        streamedTimeTotal: getValue("STREAMED_TIME_TOTAL"),
-        userAgent: (dataUserAgent?.data.name || "") as string,
-        speedTest: (dataSpeedTest?.data?.downloadSpeed.toFixed(2)?.concat(" MB") || "") as string
-      });
-    console.log(metricsUser)
-    postMetricsMutation.mutate(metricsUser);
-    setMetricsLoad(true);
+
+  const handleSubmitMetrics = () => {
+    postMetricsMutation.mutate({
+      rebufferingEvents: getValue("REBUFFERING_EVENTS"),
+      rebufferingTime: getValue("REBUFFERING_TIME"),
+      streamedTimeTotal: getValue("STREAMED_TIME_TOTAL"),
+      userAgent: (dataUserAgent?.data.name || "") as string,
+      speedTest: (dataSpeedTest?.data?.downloadSpeed.toFixed(2)?.concat(" MB") || "") as string,
+      username: dataUser?.data.name
+    });
+    setSentMetrics(true);
   }
 
   return (
     <>
       <BasicTable header={METRIC_HEADER} rows={rows}></BasicTable>
-
-      <div style={{ width: 500 }}>
-        <Doughnut data={metricsData} />
+      <div style={{display: "flex", flexDirection: "column", alignItems: "center", marginTop: 16}}>
+        {sentMetrics && <p>Metriche inviate!</p>}
+        <Button variant="contained" onClick={() => handleSubmitMetrics()}>
+          Inoltra metriche
+        </Button>
       </div>
-
     </>
 
   );
