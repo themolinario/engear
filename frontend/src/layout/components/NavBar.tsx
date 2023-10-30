@@ -27,7 +27,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import { useEffect, useState } from "react";
 import {useNavigate} from "react-router-dom";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {getVideosByQuery} from "../../api/videos.ts";
 import { useSetAtom } from "jotai";
 import {videosAtom} from "../../atoms/videosAtom.ts";
@@ -154,8 +154,9 @@ export default function NavBar() {
     const [search, setSearch] = useState("");
     const [open, setOpen] = useState(false);
     const navigate = useNavigate();
-    const [menuItems, setMenuItems] = useState<string[]>([])
-    const {data: userResult} = useQuery(["user"], getCurrentUser)
+    const [menuItems, setMenuItems] = useState<string[]>([]);
+    const {data: userResult} = useQuery(["user"], getCurrentUser);
+    const queryClient = useQueryClient();
 
     useEffect(() => {
         if (userResult?.data.roles.find((r: string) => r === "root")){
@@ -228,7 +229,11 @@ export default function NavBar() {
                     <IconButton
                         color="inherit"
                         sx={{ marginLeft: 10, marginRight: 5}}
-                        onClick={() => logout({navigate})}
+                        onClick={() => {
+                            void queryClient.invalidateQueries(["user"]);
+                            logout({navigate});
+                            }
+                        }
                     >
                         <LogoutIcon />
                     </IconButton>
