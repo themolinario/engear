@@ -61,7 +61,7 @@ export function AddVideoPage() {
 
   useEffect(() => {
     if (video) {
-      const videoRef = ref(storage, video.name + new Date().getTime());
+      const videoRef = ref(storage, new Date().getTime() + video.name);
       const videoUpload = uploadBytesResumable(videoRef, video);
       videoUpload.on("state_changed", (snapshot) => {
           const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
@@ -70,7 +70,9 @@ export function AddVideoPage() {
         () => {
         },
         () => {
-          getDownloadURL(videoUpload.snapshot.ref).then((downloadURL) => setVideoURL(downloadURL));
+          getDownloadURL(videoUpload.snapshot.ref).then((downloadURL) => {
+            setVideoURL(downloadURL)
+          });
         });
 
     }
@@ -87,7 +89,10 @@ export function AddVideoPage() {
         setImgPerc(progress);
       }, () => {
       }, () => {
-        getDownloadURL(imgUpload.snapshot.ref).then((downloadURL) => setImgURL(downloadURL));
+        getDownloadURL(imgUpload.snapshot.ref).then((downloadURL) => {
+          downloadURL.replace("https://firebasestorage.googleapis.com","https://ik.imagekit.io/mmolinari");
+          setImgURL(downloadURL);
+        });
       });
 
     }

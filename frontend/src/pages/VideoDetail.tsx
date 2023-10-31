@@ -36,7 +36,7 @@ function VideoDetail() {
   };
 
   const { data: dataVideo, isLoading } = useQuery({
-    queryKey: [videoId],
+    queryKey: ["video",videoId],
     queryFn: () => findVideoById(videoId || ""),
     onSuccess: ({ data }) => {
       videoMutations.updateViews.mutate(videoId);
@@ -109,21 +109,23 @@ function VideoDetail() {
     console.log("Result of format of rebuffering:", millisToMinutesAndSeconds(bufferingTimeRef.current));
   };
 
-
   if (isLoading) return <PageLoader />;
-
+  const videoUrlKit =
+    dataVideo?.data.videoUrl.replace("https://firebasestorage.googleapis.com","https://ik.imagekit.io/mmolinari").replace("?","/ik-master.m3u8?tr=sr-240_360_480_720&");
   return (
     <div>
       <h1>{dataVideo?.data.title}</h1>
       <div style={{ width: "100%", height: 500, position: "relative" }}>
-        <ReactPlayer
+          <ReactPlayer
           width={"100%"}
           height="100%"
-          url={dataVideo?.data.videoUrl}
+          url={videoUrlKit}
           onProgress={handleProgress}
           onBuffer={handleBuffer}
           onBufferEnd={handleBufferEnd}
-          controls />
+          controls
+        />
+
       </div>
       <h2>Views: {dataVideo?.data.views}</h2>
       <h2>Streamed time total: {formatTime(playedSeconds)}</h2>
