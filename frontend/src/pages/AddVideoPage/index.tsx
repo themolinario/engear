@@ -61,7 +61,7 @@ export function AddVideoPage() {
 
   useEffect(() => {
     if (video) {
-      const videoRef = ref(storage, new Date().getTime() + video.name);
+      const videoRef = ref(storage, video.name);
       const videoUpload = uploadBytesResumable(videoRef, video);
       videoUpload.on("state_changed", (snapshot) => {
           const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;

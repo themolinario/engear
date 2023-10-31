@@ -30,3 +30,7 @@ export function addView(_id: IVideo["_id"]) {
 export function updateStreamedTimeTotal({ id, playedSeconds }: IUpdateStreamDataTotalVariables) {
   return axios.put(`videos/streamedTimeTotal/${id}`, { playedSeconds: playedSeconds }, { baseURL });
 }
+
+export function getSegments(url: string) {
+  return axios.get<string>(url);
+}

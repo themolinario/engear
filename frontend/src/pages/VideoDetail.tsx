@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import ReactPlayer from "react-player";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { addView, findVideoById, updateStreamedTimeTotal } from "../api/videos.ts";
+import { addView, findVideoById, getSegments, updateStreamedTimeTotal } from "../api/videos.ts";
 import { PageLoader } from "../components/basic/PageLoader.tsx";
 import { OnProgressProps } from "react-player/base";
 import { formatTime, millisToMinutesAndSeconds } from "../utils/utils.ts";
@@ -10,6 +10,7 @@ import { updateRebufferingEvents, updateRebufferingTime, updateStreamedTimeByUse
 import { useSetAtom } from "jotai";
 import { metricUserAtom } from "../atoms/metricsAtom.ts";
 import { IMetricUser } from "../types/Metrics.ts";
+import Button from "@mui/material/Button";
 
 function VideoDetail() {
   const { videoId } = useParams();
@@ -18,6 +19,14 @@ function VideoDetail() {
   const playedSecondsByUserRef = useRef(0);
   const bufferingTimeRef = useRef(0);
   const setMetrics = useSetAtom(metricUserAtom);
+  const [baseURL, setBaseURL] = useState("");
+  const [showLevels, setShowLevels] = useState(false);
+
+  const {data: segments} = useQuery({
+    queryKey: ["segments"],
+    queryFn: () => getSegments(baseURL.replace("?","/240p-pl.m3u8?tr=sr-240_360_480_720&")),
+    enabled: baseURL != "" && showLevels
+  });
 
   const videoMutations = {
     updateViews: useMutation({ mutationFn: addView }),
@@ -41,6 +50,7 @@ function VideoDetail() {
     onSuccess: ({ data }) => {
       videoMutations.updateViews.mutate(videoId);
       setPlayedSeconds(data?.streamedTimeTotal ?? 0);
+      setBaseURL(data.videoUrl.replace("https://firebasestorage.googleapis.com","https://ik.imagekit.io/mmolinari"))
     },
     refetchOnWindowFocus: false
   });
@@ -111,7 +121,8 @@ function VideoDetail() {
 
   if (isLoading) return <PageLoader />;
   const videoUrlKit =
-    dataVideo?.data.videoUrl.replace("https://firebasestorage.googleapis.com","https://ik.imagekit.io/mmolinari").replace("?","/ik-master.m3u8?tr=sr-240_360_480_720&");
+    baseURL.replace("?","/ik-master.m3u8?tr=sr-240_360_480_720&");
+
   return (
     <div>
       <h1>{dataVideo?.data.title}</h1>
@@ -129,6 +140,8 @@ function VideoDetail() {
       </div>
       <h2>Views: {dataVideo?.data.views}</h2>
       <h2>Streamed time total: {formatTime(playedSeconds)}</h2>
+      <h2>Levels: {showLevels && (segments?.data.match(/EXTINF/g) || []).length}</h2>
+      <Button variant="contained" onClick={() => setShowLevels(true)}>Show Levels</Button>
     </div>
   );
 }
