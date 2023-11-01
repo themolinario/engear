@@ -22,6 +22,7 @@ import { LinearProgress } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { AlertMessage } from "../../components/basic/AlertMessage.tsx";
+import { getVideoMetadata } from "../../utils/utils.ts";
 
 
 export function AddVideoPage() {
@@ -51,11 +52,17 @@ export function AddVideoPage() {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    console.log("storage", storage)
+
+    const responseMetadata = await getVideoMetadata(videoURL)
+
     uploadVideoMutation.mutate({
       title: title,
       desc: desc,
       videoUrl: videoURL,
-      imgUrl: imgURL
+      imgUrl: imgURL,
+      size: responseMetadata?.size ?? 0
     });
   };
 

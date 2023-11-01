@@ -12,6 +12,7 @@ import {
   sub,
   trend,
   updatedVideo,
+  getVideoChunk, getVideoSegmentList
 } from "../controllers/video.js";
 
 const router = express.Router();
@@ -27,6 +28,7 @@ router.get("/random", random);
 router.get("/sub", verifyToken, sub);
 router.get("/tags", getByTag);
 router.get("/search", search);
-
+router.get("/video-chunk/:id", getVideoChunk);
+router.get("/video-segment-list/:id", getVideoSegmentList)
 
 export default router;

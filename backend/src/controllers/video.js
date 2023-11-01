@@ -1,6 +1,15 @@
 import Video from "../models/Video.js";
 import { createError } from "../error.js";
 import User from "../models/User.js";
+import { getChunkProps } from "../utils/index.js";
+import https from "https";
+import ffmpeg from "fluent-ffmpeg";
+import ffmpegInstaller from "@ffmpeg-installer/ffmpeg";
+import os from 'os';
+import path from "path";
+import fs from 'fs'
+
+ffmpeg.setFfmpegPath(ffmpegInstaller.path);
 
 export const addVideo = async (req, res, next) => {
   const newVideo = new Video({
@@ -85,11 +94,10 @@ export const updateStreamedTimeTotal = async (req, res, next) => {
     );
 
     if (!updatedVideo) {
-      return next(createError(404, "Video not found!"))
+      return next(createError(404, "Video not found!"));
     }
 
-    return res.status(200).json(updatedVideo)
-
+    return res.status(200).json(updatedVideo);
   } catch (e) {
     next(e);
   }
@@ -162,3 +170,122 @@ export const search = async (req, res, next) => {
   }
 };
 
+export const getVideoChunk = async (req, res, next) => {
+  const video = await Video.findById(req.params.id);
+
+  const fileSize = video.size;
+  const resolvedPath = video.videoUrl;
+
+  const requestRangeHeader = req.headers.range;
+
+  try {
+    if (!requestRangeHeader) {
+      res.writeHead(200, {
+        "Content-Length": fileSize,
+        "Content-Type": "video/mp4",
+      });
+
+      https.get(resolvedPath, (stream) => {
+        stream.pipe(res);
+      });
+    } else {
+      const { start, end, chunkSize } = getChunkProps(
+        requestRangeHeader,
+        fileSize,
+      );
+
+      res.writeHead(206, {
+        "Content-Range": `bytes ${start}-${end}/${fileSize}`,
+        "Accept-Ranges": "bytes",
+        "Content-Length": chunkSize,
+        "Content-Type": "video/mp4",
+      });
+
+      const options = {
+        headers: {
+          Range: `bytes=${start}-${end}`,
+        },
+      };
+
+      https.get(resolvedPath, options, (stream) => {
+        stream.pipe(res);
+      });
+    }
+  } catch (e) {
+    next(e);
+  }
+};
+
+export const getVideoSegmentList = async (req, res, next) => {
+  const video = await Video.findById(req.params.id);
+
+  const resolvedPath = video.videoUrl;
+
+  const subFolderPath = 'segments'
+  const tmpDir = os.tmpdir()
+
+  const fullPath = path.join(tmpDir, subFolderPath)
+  console.log("fullPath", fullPath)
+
+  if (!fs.existsSync(fullPath)){
+    fs.mkdirSync(fullPath);
+  }
+
+  const command = ffmpeg(resolvedPath, { timeout: 432000 })
+    .addOption([
+      "-profile:v baseline",
+      "-f segment",
+      "-level 3.0",
+      "-start_number 0",
+      "-hls_base_url segments/",
+      "-hls_segment_filename ".concat(path.join(fullPath,"file%03d.ts")), //../../assets/segments/file%03d.ts
+      "-hls_time 6",
+      "-hls_list_size 0",
+      "-f hls",
+    ])
+      // "../../assets/segments/output.m3u8"
+    .output(path.join(fullPath, "output.m3u8"))
+    .on("end", (stdout, stderr) => {
+      console.log("Transcoding succeeded !");
+      process.exit(1);
+    })
+    .on("start", (commandLine) => {
+      console.log("start", commandLine);
+    })
+    .on("codecData", (data) => {
+      console.log(
+        "Input is " + data.audio + " audio " + "with " + data.video + " video",
+      );
+    })
+    .on("progress", function (progress) {
+      console.log("Processing. Timemark: -> " + progress.timemark);
+    })
+    .on("stderr", function (stderrLine) {
+      // do nothing
+    })
+    .on("error", function (err, stdout, stderr) {
+      console.log("Cannot process video: " + err.message);
+      console.log("stdout:\n" + stdout);
+      console.log("stderr:\n" + stderr);
+      process.exit(1);
+    })
+    .on("data", function (chunk) {
+      console.log("ffmpeg just wrote " + chunk.length + " bytes");
+    });
+
+  command.run();
+};
+
+
+/*
+export const getVideoSegmentList = async (req, res, next) => {
+
+  const subFolderPath = 'segments'
+  const tmpDir = os.tmpdir()
+
+  const fullPath = path.join(tmpDir, subFolderPath)
+  console.log("fullPath", fullPath)
+
+  res.sendFile(fullPath);
+}
+*/

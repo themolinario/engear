@@ -12,6 +12,7 @@ export interface IVideo {
   dislikes: string[];
   createdAt?: string;
   updatedAt?: string;
+  size: number;
 }
 
 export interface IUpdateStreamDataTotalVariables {
