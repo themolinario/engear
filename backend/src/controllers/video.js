@@ -1,6 +1,7 @@
 import Video from "../models/Video.js";
 import { createError } from "../error.js";
 import User from "../models/User.js";
+import { imagekit, WEBHOOK_EXPIRY_DURATION, WEBHOOK_SECRET } from "../config/imageKit.js";
 
 export const addVideo = async (req, res, next) => {
   const newVideo = new Video({
@@ -161,4 +162,51 @@ export const search = async (req, res, next) => {
     next(e);
   }
 };
+
+export const videoImageKitWebhook = async(req, res, next) => {
+  const signature = req.headers["x-ik-signature"];
+  const requestBody = req.body;
+
+  let webhookResult;
+  try {
+    webhookResult = imagekit.verifyWebhookEvent(JSON.stringify(requestBody), signature, WEBHOOK_SECRET);
+  } catch (e) {
+    // `verifyWebhookEvent` method will throw an error if signature is invalid
+    console.log(e);
+    res.status(400).send(`Webhook Error`);
+  }
+
+  const { timestamp, event } = webhookResult;
+
+  // Check if webhook has expired
+  if (timestamp + WEBHOOK_EXPIRY_DURATION < Date.now()) {
+    res.status(400).send(`Webhook Error`);
+  }
+
+  // Handle webhook
+  switch (event.type) {
+    case 'video.transformation.accepted':
+      console.log("video.transformation.accepted")
+      // It is triggered when a new video transformation request is accepted for processing. You can use this for debugging purposes.
+      break;
+    case 'video.transformation.ready':
+      console.log("video.transformation.ready")
+      // It is triggered when a video encoding is finished, and the transformed resource is ready to be served. You should listen to this webhook and update any flag in your database or CMS against that particular asset so your application can start showing it to users.
+      break;
+    case 'video.transformation.error':
+      console.log("video.transformation.error")
+      // It is triggered if an error occurs during encoding. Listen to this webhook to log the reason. You should check your origin and URL-endpoint settings if the reason is related to download failure. If the reason seems like an error on the ImageKit side, then raise a support ticket at support@imagekit.io.
+      break;
+    default:
+      // Unexpected event type
+      console.log(`Unhandled event type ${event.type}`);
+      return res.status(400).end();
+  }
+
+// Return a 200 response to acknowledge receipt of the event
+  res.status(200).json({received: true});
+
+}
+
+
 

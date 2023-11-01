@@ -11,7 +11,7 @@ import {
   search,
   sub,
   trend,
-  updatedVideo,
+  updatedVideo, videoImageKitWebhook
 } from "../controllers/video.js";
 
 const router = express.Router();
@@ -27,6 +27,7 @@ router.get("/random", random);
 router.get("/sub", verifyToken, sub);
 router.get("/tags", getByTag);
 router.get("/search", search);
+router.post("/webhook", videoImageKitWebhook)
 
 
 export default router;
