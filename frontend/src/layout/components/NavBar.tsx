@@ -25,15 +25,16 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getVideosByQuery } from "../../api/videos.ts";
 import { useSetAtom } from "jotai";
 import { videosAtom } from "../../atoms/videosAtom.ts";
 import { logout } from "../../api/logout.ts";
 import { useAtomValue } from "jotai";
 import { userAtom } from "../../atoms/userAtom.ts";
+import { getCurrentUser } from "../../api/user.ts";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -156,9 +157,20 @@ export default function NavBar() {
   const navigate = useNavigate();
   const [menuItems, setMenuItems] = useState<string[]>([]);
   const queryClient = useQueryClient();
-  const userData = useAtomValue(userAtom);
+  const userDataAtom = useAtomValue(userAtom);
 
-  useEffect(() => {
+  useQuery({
+    queryKey: ["user"],
+    queryFn: () => getCurrentUser(),
+    onSuccess: ({ data }) => {
+      handleMenuItem(data);
+    },
+    refetchOnWindowFocus: false
+  });
+
+
+  const handleMenuItem = (data: any) => {
+    const userData = userDataAtom._id ? userDataAtom : data;
     const isRoot = userData?.roles.find((role: string) => role === "root");
     const isStandard = userData?.roles.find((role: string) => role === "standard");
 
@@ -167,8 +179,7 @@ export default function NavBar() {
     } else if (isStandard) {
       setMenuItems(["Dashboard", "Metrics"]);
     }
-  }, [userData]);
-
+  };
 
   const setVideos = useSetAtom(videosAtom);
 
