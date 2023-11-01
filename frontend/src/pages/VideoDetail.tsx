@@ -25,7 +25,8 @@ function VideoDetail() {
   const {data: segments} = useQuery({
     queryKey: ["segments"],
     queryFn: () => getSegments(baseURL.replace("?","/240p-pl.m3u8?tr=sr-240_360_480_720&")),
-    enabled: baseURL != "" && showLevels
+    enabled: baseURL != "" && showLevels,
+    refetchOnWindowFocus: false
   });
 
   const videoMutations = {
