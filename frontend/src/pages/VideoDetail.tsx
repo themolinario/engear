@@ -31,8 +31,8 @@ function VideoDetail() {
     activeLevels: false,
     numberLevels: 0,
     showLevels: false
-
   });
+  const [bandWidth, setBandWidth] = useState('')
 
   useEffect(() => {
 
@@ -48,9 +48,11 @@ function VideoDetail() {
 
         const bandWidth = getBandWidthDistribution(segments);
 
-        console.log("bandWidth", bandWidth);
+        setBandWidth(formatBytes(bandWidth))
 
-        console.log("bandWidth format", formatBytes(bandWidth))
+        // console.log("bandWidth", bandWidth);
+        //
+        // console.log("bandWidth format", formatBytes(bandWidth))
 
         setInfoLevels(prevState =>
           ({ ...prevState, numberLevels: getLevelsNumber(segments), showLevels: true }));
@@ -246,10 +248,9 @@ function VideoDetail() {
       <h2>Views: {dataVideo?.data.views}</h2>
       <h2>Streamed time total: {formatTime(playedSeconds)}</h2>
       {/*<h2>Levels: {showLevels && (segments?.data.match(/EXTINF/g) || []).length}</h2>*/}
-      {/*<h2>Levels: {showLevels && numberLevels}</h2>*/}
-
       {/*<Button variant="contained" onClick={() => setShowLevels(true)}>Show Levels</Button>*/}
       <h2>Levels: {infoLevels.showLevels && infoLevels.numberLevels}</h2>
+      <h2>BandWidth: {infoLevels.showLevels && bandWidth}</h2>
 
       <Button variant="contained" onClick={() => activeLevels()}>Show Levels</Button>
 
