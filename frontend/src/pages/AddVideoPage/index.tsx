@@ -64,7 +64,7 @@ export function AddVideoPage() {
       const videoRef = ref(storage, video.name);
       const videoUpload = uploadBytesResumable(videoRef, video);
       videoUpload.on("state_changed", (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          const progress = Number(((snapshot.bytesTransferred / snapshot.totalBytes) * 100).toFixed(2));
           setVideoPerc(progress);
         },
         () => {
@@ -85,7 +85,7 @@ export function AddVideoPage() {
       const imgRef = ref(storage, img.name + new Date().getTime());
       const imgUpload = uploadBytesResumable(imgRef, img);
       imgUpload.on("state_changed", (snapshot) => {
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        const progress = Number(((snapshot.bytesTransferred / snapshot.totalBytes) * 100).toFixed(2));
         setImgPerc(progress);
       }, () => {
       }, () => {
@@ -130,7 +130,10 @@ export function AddVideoPage() {
               padding: 4,
               border: 1,
               borderRadius: 2,
-              marginBottom: 2
+              marginBottom: 2,
+              gap: "15px",
+              textAlign: "center",
+
             }}
           >
             <Button component="label" variant="contained" startIcon={<CloudUploadIcon />}>
@@ -163,7 +166,9 @@ export function AddVideoPage() {
               padding: 4,
               border: 1,
               borderRadius: 2,
-              marginBottom: 2
+              marginBottom: 2,
+              gap: "15px",
+              textAlign: "center",
             }}
           >
             <Button component="label" variant="contained" startIcon={<CloudUploadIcon />}>
