@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import ReactPlayer from "react-player";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { addView, findVideoById, /*getSegments,*/ updateStreamedTimeTotal } from "../api/videos.ts";
+import { addView, findVideoById, getSegments, /*getSegments,*/ updateStreamedTimeTotal } from "../api/videos.ts";
 import { PageLoader } from "../components/basic/PageLoader.tsx";
 import { OnProgressProps } from "react-player/base";
 import { formatBytes, formatTime, millisToMinutesAndSeconds } from "../utils/utils.ts";
@@ -40,6 +40,7 @@ function VideoDetail() {
   const [bandWidth, setBandWidth] = useState("");
   const apiCallsRef = useRef([""]);
   const countRef = useRef(0);
+  const [isLoadingVideo, setIsLoadingVideo] = useState(true);
 
   const videoMutations = {
     updateViews: useMutation({ mutationFn: addView }),
@@ -71,6 +72,24 @@ function VideoDetail() {
       setPlayedSeconds(data?.streamedTimeTotal ?? 0);
       setBaseURL(data.videoUrl.replace("https://firebasestorage.googleapis.com", "https://ik.imagekit.io/mmolinari"));
     },
+    enabled: !isLoadingVideo,
+    refetchOnWindowFocus: false
+  });
+
+  useQuery({
+    queryKey: ["segments"],
+    queryFn: () => getSegments(baseURL.replace("?", "/ik-master.m3u8?tr=sr-240_360_480_720&")),
+    refetchInterval: (data) => {
+      if (data?.status === 202) {
+        return 5000;
+      } else {
+        setIsLoadingVideo(false);
+        return false;
+      }
+
+    },
+    enabled: baseURL != "",
+    cacheTime: 0,
     refetchOnWindowFocus: false
   });
 
@@ -167,15 +186,6 @@ function VideoDetail() {
     setInfoLevels(prevState => ({ ...prevState, activeLevels: true }));
   };
 
-
-  // const { data: segments } = useQuery({
-  //   queryKey: ["segments"],
-  //   queryFn: () => getSegments(baseURL.replace("?", "/240p-pl.m3u8?tr=sr-240_360_480_720&")),
-  //   enabled: baseURL != "" && showLevels,
-  //   refetchOnWindowFocus: false
-  // });
-
-
   const updateStreamedTime = () => {
     if (playedSecondsRef.current) {
       videoMutations.updateStreamedTimeByVideo.mutate({ id: videoId, playedSeconds: playedSecondsRef.current });
@@ -252,7 +262,9 @@ function VideoDetail() {
     console.log("Result of format of rebuffering:", millisToMinutesAndSeconds(bufferingTimeRef.current));
   };
 
-  if (isLoading) return <PageLoader />;
+  if (isLoading || isLoadingVideo) return <PageLoader />;
+  console.log("isLoading", isLoading)
+  console.log("isLoadingVideo", isLoadingVideo)
   const videoUrlKit =
     baseURL.replace("?", "/ik-master.m3u8?tr=sr-240_360_480_720&");
 
