@@ -8,6 +8,7 @@ import { getCurrentUser, getSpeedTest } from "../../api/user.ts";
 import BasicTable from "./components/BasicTable.tsx";
 import Button from "@mui/material/Button";
 import { useState } from "react";
+import { formatTime, millisToMinutesAndSeconds } from "../../utils/utils.ts";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -37,7 +38,7 @@ export function MetricsPage() {
 
   const postMetricsMutation = useMutation({
     mutationFn: postMetrics
-  })
+  });
 
   const [
     { isLoading: isIpLoading, data: dataIp },
@@ -56,7 +57,7 @@ export function MetricsPage() {
   const getValue = (value: string) => {
     switch (value) {
       case "STREAMED_TIME_TOTAL":
-        return (metricsUser.streamedTimeTotal ? metricsUser.streamedTimeTotal : dataUser?.data?.streamedTimeTotal) ;
+        return metricsUser.streamedTimeTotal ? metricsUser.streamedTimeTotal : dataUser?.data?.streamedTimeTotal;
       case "REBUFFERING_EVENTS":
         return metricsUser.rebufferingEvents != "N.N." ? metricsUser.rebufferingEvents : dataUser?.data?.rebufferingEvents;
       case "REBUFFERING_TIME":
@@ -68,9 +69,9 @@ export function MetricsPage() {
     [
       { value: dataIp?.data.ip },
       { value: dataUserAgent?.data.name },
-      { value: getValue("STREAMED_TIME_TOTAL"), tooltipTitle: "HH:MM:SS" },
+      { value: formatTime(getValue("STREAMED_TIME_TOTAL")), tooltipTitle: "HH:MM:SS" },
       { value: getValue("REBUFFERING_EVENTS") },
-      { value: getValue("REBUFFERING_TIME"), tooltipTitle: "MM:SS" },
+      { value: millisToMinutesAndSeconds(getValue("REBUFFERING_TIME")), tooltipTitle: "MM:SS" },
       { value: getScreenSize() },
       { value: dataSpeedTest?.data?.downloadSpeed.toFixed(2)?.concat(" MB") }]
   ];
@@ -87,12 +88,12 @@ export function MetricsPage() {
       username: dataUser?.data.name
     });
     setSentMetrics(true);
-  }
+  };
 
   return (
     <>
       <BasicTable header={METRIC_HEADER} rows={rows}></BasicTable>
-      <div style={{display: "flex", flexDirection: "column", alignItems: "center", marginTop: 16}}>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: 16 }}>
         {sentMetrics && <p>Metriche inviate!</p>}
         <Button variant="contained" onClick={() => handleSubmitMetrics()}>
           Inoltra metriche
