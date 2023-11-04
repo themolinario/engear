@@ -158,6 +158,7 @@ export default function NavBar() {
   const [menuItems, setMenuItems] = useState<string[]>([]);
   const queryClient = useQueryClient();
   const userDataAtom = useAtomValue(userAtom);
+  const setVideos = useSetAtom(videosAtom);
 
   useQuery({
     queryKey: ["user"],
@@ -165,7 +166,7 @@ export default function NavBar() {
     onSuccess: ({ data }) => {
       handleMenuItem(data);
     },
-    refetchOnWindowFocus: false
+    refetchOnWindowFocus: false,
   });
 
 
@@ -181,7 +182,12 @@ export default function NavBar() {
     }
   };
 
-  const setVideos = useSetAtom(videosAtom);
+  const { mutate: searchMutation } = useMutation({
+    mutationFn: (query: string) => getVideosByQuery(query),
+    onSuccess: (res) => {
+      setVideos(res.data);
+    }
+  });
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -191,12 +197,6 @@ export default function NavBar() {
     setOpen(false);
   };
 
-  const { mutate: searchMutation } = useMutation({
-    mutationFn: (query: string) => getVideosByQuery(query),
-    onSuccess: (res) => {
-      setVideos(res.data);
-    }
-  });
 
   return (
     <Box sx={{ display: "flex" }}>
