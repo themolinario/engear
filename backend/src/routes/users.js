@@ -9,9 +9,9 @@ import {
   subscribe,
   unsubscribe,
   updateRebufferingEvents,
-  updateRebufferingTime,
+  updateRebufferingTime, updateStreamedData,
   // update,
-  updateStreamedTimeByUser,
+  updateStreamedTimeByUser
 } from "../controllers/user.js";
 import { verifyToken } from "../verifyToken.js";
 
@@ -34,6 +34,8 @@ router.put("/like/:videoId", verifyToken, like);
 router.put("/dislike/:videoId", verifyToken, dislike);
 
 router.put("/streamedTimeTotal", verifyToken, updateStreamedTimeByUser);
+
+router.put("/streamedData", verifyToken, updateStreamedData);
 
 router.put("/rebufferingEvents", verifyToken, updateRebufferingEvents);
 

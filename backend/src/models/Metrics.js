@@ -19,6 +19,10 @@ const MetricsSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    streamedData: {
+      type: String,
+      required: true,
+    },
     rebufferingEvents: {
       type: String,
       required: true,

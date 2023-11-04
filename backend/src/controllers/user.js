@@ -179,6 +179,28 @@ export const updateStreamedTimeByUser = async (req, res, next) => {
   }
 };
 
+export const updateStreamedData = async (req, res, next) => {
+  try {
+    const { id } = req.user;
+    const { streamedData } = req.body;
+    const user = await User.findByIdAndUpdate(
+      id,
+      { $inc: { streamedData: streamedData } },
+      { new: true },
+    );
+
+    if (!user) {
+      return next(createError(404, "User not found!"));
+    }
+
+    res.status(200).json(user);
+
+  } catch (e) {
+    next(e)
+
+  }
+}
+
 export const updateRebufferingEvents = async (req, res, next) => {
   try {
     const { id } = req.user;

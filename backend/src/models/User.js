@@ -30,6 +30,10 @@ const UserSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    streamedData: {
+      type: Number,
+      default: 0,
+    },
     rebufferingEvents: {
       type: Number,
       default: 0,

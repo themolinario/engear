@@ -3,8 +3,8 @@ import { getAllMetrics } from "../../api/metrics.ts";
 import { PageLoader } from "../../components/basic/PageLoader.tsx";
 import { Doughnut } from "react-chartjs-2";
 
-export function GeneralMetricsPage () {
-  const {data: generalMetrics, isLoading: isMetricsLoading} = useQuery({
+export function GeneralMetricsPage() {
+  const { data: generalMetrics, isLoading: isMetricsLoading } = useQuery({
     queryKey: ["general"],
     queryFn: getAllMetrics
   });
@@ -13,9 +13,10 @@ export function GeneralMetricsPage () {
   const rebufferingTimes = generalMetrics?.data.map(m => m.rebufferingTime) || [];
   const rebufferingEvents = generalMetrics?.data.map(m => m.rebufferingEvents) || [];
   const streamedTime = generalMetrics?.data.map(m => m.streamedTimeTotal) || [];
+  const streamedData = generalMetrics?.data.map(m => m.streamedData) || [];
   const userAgent = generalMetrics?.data.map(m => m.userAgent) || [];
-  const userAgentValues : number[]= []
-  userAgent.forEach(e => (userAgentValues[userAgent.indexOf(e)] = (userAgentValues[userAgent.indexOf(e)] || 0) + 1 ));
+  const userAgentValues: number[] = [];
+  userAgent.forEach(e => (userAgentValues[userAgent.indexOf(e)] = (userAgentValues[userAgent.indexOf(e)] || 0) + 1));
   const userAgentNames = userAgent.filter((u, idx) => userAgent.indexOf(u) === idx);
 
   if (isMetricsLoading) return <PageLoader />;
@@ -128,6 +129,33 @@ export function GeneralMetricsPage () {
     ]
   };
 
+  const streamedDataTotal = {
+    labels: generalMetrics?.data.map(m => m.username),
+    datasets: [
+      {
+        label: "Streamed data",
+        data: streamedData,
+        backgroundColor: [
+          "rgba(255, 99, 132, 0.2)",
+          "rgba(54, 162, 235, 0.2)",
+          "rgba(255, 206, 86, 0.2)",
+          "rgba(75, 192, 192, 0.2)",
+          "rgba(153, 102, 255, 0.2)",
+          "rgba(255, 159, 64, 0.2)"
+        ],
+        borderColor: [
+          "rgba(255, 99, 132, 1)",
+          "rgba(54, 162, 235, 1)",
+          "rgba(255, 206, 86, 1)",
+          "rgba(75, 192, 192, 1)",
+          "rgba(153, 102, 255, 1)",
+          "rgba(255, 159, 64, 1)"
+        ],
+        borderWidth: 1
+      }
+    ]
+  };
+
   const userAgentData = {
     labels: userAgentNames,
     datasets: [
@@ -189,6 +217,7 @@ export function GeneralMetricsPage () {
         </div>
 
       </div>
+
       <div style={{
         display: "flex"
       }}>
@@ -226,6 +255,17 @@ export function GeneralMetricsPage () {
             display: "flex",
             justifyContent: "center"
           }}>
+            <h4>Streamed Data</h4>
+          </div>
+          <Doughnut data={streamedDataTotal} />
+        </div>
+        <div style={{
+          flex: 1
+        }}>
+          <div style={{
+            display: "flex",
+            justifyContent: "center"
+          }}>
             <h4>User Agent</h4>
           </div>
           <Doughnut data={userAgentData} />
@@ -233,5 +273,5 @@ export function GeneralMetricsPage () {
       </div>
 
     </div>
-  )
+  );
 }

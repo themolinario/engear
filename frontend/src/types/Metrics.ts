@@ -30,6 +30,7 @@ export interface IUserAgent {
 
 export interface IMetricUser {
     streamedTimeTotal: number,
+    streamedData: number,
     rebufferingEvents: string,
     rebufferingTime: number,
     userAgent: string,

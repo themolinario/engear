@@ -6,6 +6,7 @@ export interface IUser {
   subscribers: number;
   subscribedUsers: IUser[],
   streamedTimeTotal: number,
+  streamedData: number,
   rebufferingEvents: number,
   rebufferingTime: number,
   roles: string[]

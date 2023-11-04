@@ -8,7 +8,7 @@ import { getCurrentUser, getSpeedTest } from "../../api/user.ts";
 import BasicTable from "./components/BasicTable.tsx";
 import Button from "@mui/material/Button";
 import { useState } from "react";
-import { formatTime, millisToMinutesAndSeconds } from "../../utils/utils.ts";
+import { formatBytes, formatTime, millisToMinutesAndSeconds } from "../../utils/utils.ts";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -16,6 +16,7 @@ const METRIC_HEADER = [
   "IP",
   "User agent",
   "Streamed time",
+  "Streamed data",
   "Rebuffering events",
   "Rebuffering time",
   "Screen size",
@@ -58,6 +59,8 @@ export function MetricsPage() {
     switch (value) {
       case "STREAMED_TIME_TOTAL":
         return metricsUser.streamedTimeTotal ? metricsUser.streamedTimeTotal : dataUser?.data?.streamedTimeTotal;
+      case "STREAMED_DATA_TOTAL":
+        return metricsUser.streamedData ? metricsUser.streamedData : dataUser?.data?.streamedData;
       case "REBUFFERING_EVENTS":
         return metricsUser.rebufferingEvents != "N.N." ? metricsUser.rebufferingEvents : dataUser?.data?.rebufferingEvents;
       case "REBUFFERING_TIME":
@@ -70,6 +73,7 @@ export function MetricsPage() {
       { value: dataIp?.data.ip },
       { value: dataUserAgent?.data.name },
       { value: formatTime(getValue("STREAMED_TIME_TOTAL")), tooltipTitle: "HH:MM:SS" },
+      { value: formatBytes(getValue("STREAMED_DATA_TOTAL")) },
       { value: getValue("REBUFFERING_EVENTS") },
       { value: millisToMinutesAndSeconds(getValue("REBUFFERING_TIME")), tooltipTitle: "MM:SS" },
       { value: getScreenSize() },
@@ -83,6 +87,7 @@ export function MetricsPage() {
       rebufferingEvents: getValue("REBUFFERING_EVENTS"),
       rebufferingTime: getValue("REBUFFERING_TIME"),
       streamedTimeTotal: getValue("STREAMED_TIME_TOTAL"),
+      streamedData: getValue("STREAMED_DATA_TOTAL"),
       userAgent: (dataUserAgent?.data.name || "") as string,
       speedTest: (dataSpeedTest?.data?.downloadSpeed.toFixed(2)?.concat(" MB") || "") as string,
       username: dataUser?.data.name

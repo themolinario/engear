@@ -6,7 +6,12 @@ import { PageLoader } from "../components/basic/PageLoader.tsx";
 import { OnProgressProps } from "react-player/base";
 import { formatBytes, formatTime, millisToMinutesAndSeconds } from "../utils/utils.ts";
 import { useEffect, useRef, useState } from "react";
-import { updateRebufferingEvents, updateRebufferingTime, updateStreamedTimeByUser } from "../api/user.ts";
+import {
+  updateRebufferingEvents,
+  updateRebufferingTime,
+  updateStreamedData,
+  updateStreamedTimeByUser
+} from "../api/user.ts";
 import { useSetAtom } from "jotai";
 import { metricUserAtom } from "../atoms/metricsAtom.ts";
 import { IMetricUser } from "../types/Metrics.ts";
@@ -32,56 +37,92 @@ function VideoDetail() {
     numberLevels: 0,
     showLevels: false
   });
-  const [bandWidth, setBandWidth] = useState('')
+  const [bandWidth, setBandWidth] = useState("");
+  const apiCallsRef = useRef([""]);
+  const countRef = useRef(0);
+
+  const videoMutations = {
+    updateViews: useMutation({ mutationFn: addView }),
+    updateStreamedTimeByVideo: useMutation({ mutationFn: updateStreamedTimeTotal })
+  };
+
+  const userMutations = {
+    updateStreamedTimeByUser: useMutation(
+      {
+        mutationFn: updateStreamedTimeByUser,
+        onSuccess: (res) =>
+          setMetrics((prev: IMetricUser) => ({ ...prev, streamedTimeTotal: res.data?.streamedTimeTotal }))
+      }),
+    updateStreamedData: useMutation(
+      {
+        mutationFn: updateStreamedData,
+        onSuccess: (res) =>
+          setMetrics((prev: IMetricUser) => ({ ...prev, streamedData: res.data?.streamedData }))
+      }),
+    updateRebufferingEvents: useMutation({ mutationFn: updateRebufferingEvents }),
+    updateRebufferingTime: useMutation({ mutationFn: updateRebufferingTime })
+  };
+
+  const { data: dataVideo, isLoading } = useQuery({
+    queryKey: ["video", videoId],
+    queryFn: () => findVideoById(videoId || ""),
+    onSuccess: ({ data }) => {
+      videoMutations.updateViews.mutate(videoId);
+      setPlayedSeconds(data?.streamedTimeTotal ?? 0);
+      setBaseURL(data.videoUrl.replace("https://firebasestorage.googleapis.com", "https://ik.imagekit.io/mmolinari"));
+    },
+    refetchOnWindowFocus: false
+  });
 
   useEffect(() => {
 
-    const apiCallsResult = getApiXmlHttpRequest();
-
     if (infoLevels.activeLevels) {
-      setTimeout(() => {
-        console.log("apiCallsResult", apiCallsResult);
+      console.log("apiCallRef", apiCallsRef.current);
 
-        const segments = getSegmentsLevels(apiCallsResult);
+      const segments = getSegmentsLevels(apiCallsRef.current);
+      console.log("segments", segments);
 
-        console.log("segments", segments);
+      const bandWidth = getBandWidthDistribution(segments);
+      setBandWidth(formatBytes(bandWidth));
 
-        const bandWidth = getBandWidthDistribution(segments);
+      setInfoLevels(prevState =>
+        ({ ...prevState, numberLevels: getLevelsNumber(segments), showLevels: true }));
 
-        setBandWidth(formatBytes(bandWidth))
+      infoLevels.activeLevels = false;
 
-        // console.log("bandWidth", bandWidth);
-        //
-        // console.log("bandWidth format", formatBytes(bandWidth))
-
-        setInfoLevels(prevState =>
-          ({ ...prevState, numberLevels: getLevelsNumber(segments), showLevels: true }));
-
-      }, 1000);
     }
 
   }, [infoLevels.activeLevels]);
 
+  const updateStreamedDataTotal = () => {
+    const segments = getSegmentsLevels(apiCallsRef.current);
 
-  const getApiXmlHttpRequest = () => {
-    let apiCalls: string[] = [];
+    const bandWidth = getBandWidthDistribution(segments);
+
+    console.log("bandWidth mutation", bandWidth);
+
+    userMutations.updateStreamedData.mutate(bandWidth);
+
+  };
+
+  const setApiXmlHttpRequest = () => {
+    // let apiCalls: string[] = [];
 
     const observer = new PerformanceObserver((list) => {
 
       // @ts-ignore
       list.getEntries().forEach(({ initiatorType, name }) => {
         if (initiatorType === "xmlhttprequest") {
-          apiCalls.push(name);
+          apiCallsRef.current.push(name);
         }
       });
     });
 
     observer.observe({ type: "resource", buffered: true });
 
-    return apiCalls;
+    // return apiCalls;
 
   };
-
 
   const getSegmentsLevels = (apiCallsResult: string[]) => {
     const regex = /\/(\d+p)-segs/;
@@ -98,7 +139,7 @@ function VideoDetail() {
 
   };
 
-  const getBandWidthDistribution = (segments: string[]) => {
+  const getBandWidthDistribution = (segments: string[]): number => {
     let bandWidthTotal = 0;
 
     for (const segment of segments) {
@@ -134,32 +175,6 @@ function VideoDetail() {
   //   refetchOnWindowFocus: false
   // });
 
-  const videoMutations = {
-    updateViews: useMutation({ mutationFn: addView }),
-    updateStreamedTimeByVideo: useMutation({ mutationFn: updateStreamedTimeTotal })
-  };
-
-  const userMutations = {
-    updateStreamedTimeByUser: useMutation(
-      {
-        mutationFn: updateStreamedTimeByUser,
-        onSuccess: (res) =>
-          setMetrics((prev: IMetricUser) => ({ ...prev, streamedTimeTotal: res.data?.streamedTimeTotal }))
-      }),
-    updateRebufferingEvents: useMutation({ mutationFn: updateRebufferingEvents }),
-    updateRebufferingTime: useMutation({ mutationFn: updateRebufferingTime })
-  };
-
-  const { data: dataVideo, isLoading } = useQuery({
-    queryKey: ["video", videoId],
-    queryFn: () => findVideoById(videoId || ""),
-    onSuccess: ({ data }) => {
-      videoMutations.updateViews.mutate(videoId);
-      setPlayedSeconds(data?.streamedTimeTotal ?? 0);
-      setBaseURL(data.videoUrl.replace("https://firebasestorage.googleapis.com", "https://ik.imagekit.io/mmolinari"));
-    },
-    refetchOnWindowFocus: false
-  });
 
   const updateStreamedTime = () => {
     if (playedSecondsRef.current) {
@@ -174,6 +189,10 @@ function VideoDetail() {
 
   useEffect(() => {
     // mount
+    if (countRef.current === 0) {
+      setApiXmlHttpRequest();
+    }
+
     console.log("mount", videoId);
     const handleBeforeUnLoad = () => {
       updateStreamedTime();
@@ -183,11 +202,18 @@ function VideoDetail() {
 
     return () => {
       // umount
+
       console.log("unmount", playedSecondsRef.current);
 
       window.removeEventListener("beforeunload", handleBeforeUnLoad);
-      updateStreamedTime();
 
+      if (countRef.current === 1) {
+        updateStreamedDataTotal();
+
+        updateStreamedTime();
+      }
+
+      countRef.current = 1;
     };
   }, []);
 
