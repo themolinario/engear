@@ -1,34 +1,32 @@
 import { IUpdateStreamDataTotalVariables, IVideo } from "../types/Video.ts";
 import axios from "axios";
 
-const baseURL = "http://localhost:80/api";
-const headers = {Authorization: `Bearer ${window.sessionStorage.getItem('token')}`}
-export function getRandomVideos () {
-    return axios.get<IVideo[]>('videos/random', {baseURL});
+export function getRandomVideos() {
+  return axios.get<IVideo[]>("videos/random");
 }
 
 export function getVideosByQuery(query: string) {
-  return axios.get<IVideo[]>(`videos/search?q=${query}`, { baseURL });
+  return axios.get<IVideo[]>(`videos/search?q=${query}`);
 }
 
 export function findVideoById(_id: IVideo["_id"]) {
-  return axios.get<IVideo>(`videos/find/${_id}`, { baseURL });
+  return axios.get<IVideo>(`videos/find/${_id}`);
 }
 
 export function updateVideoById(video: Partial<IVideo>) {
-  return axios.put(`videos/${video._id}`, video, { baseURL });
+  return axios.put(`videos/${video._id}`, video);
 }
 
 export function postVideo(video: Partial<IVideo>) {
-  return axios.post<IVideo>("videos", video, { baseURL, headers });
+  return axios.post<IVideo>("videos", video);
 }
 
 export function addView(_id: IVideo["_id"]) {
-  return axios.post(`videos/view/${_id}`, {}, { baseURL });
+  return axios.post(`videos/view/${_id}`);
 }
 
 export function updateStreamedTimeTotal({ id, playedSeconds }: IUpdateStreamDataTotalVariables) {
-  return axios.put(`videos/streamedTimeTotal/${id}`, { playedSeconds: playedSeconds }, { baseURL });
+  return axios.put(`videos/streamedTimeTotal/${id}`, { playedSeconds: playedSeconds });
 }
 
 export function getSegments(url: string) {

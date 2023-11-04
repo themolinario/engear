@@ -24,7 +24,7 @@ export function SigninForm() {
     const {mutate: signinMutation} = useMutation({
         mutationFn: ({name, password} : {name: string, password: string}) => signIn(name || "", password || ""),
         onSuccess: (res) => {
-            axios.defaults.headers.common.Authorization = `Bearer ${res.data.token}`;
+            axios.defaults.headers.common["Authorization"] = `Bearer ${res.data.token}`;
             sessionStorage.setItem("token", res.data.token);
             setUser(res.data.user);
             navigate("/home");
