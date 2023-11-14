@@ -90,7 +90,7 @@ export function AddVideoPage() {
       }, () => {
       }, () => {
         getDownloadURL(imgUpload.snapshot.ref).then((downloadURL) => {
-          downloadURL.replace("https://firebasestorage.googleapis.com","https://ik.imagekit.io/mmolinari");
+          downloadURL.replace("https://firebasestorage.googleapis.com","https://ik.imagekit.io/mcamerino");
           setImgURL(downloadURL);
         });
       });

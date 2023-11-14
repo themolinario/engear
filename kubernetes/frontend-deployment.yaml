@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: docker-engear-fe-c
-          image: sergy98/docker-engear-fe-i:0.1
+          image: sergy98/docker-engear-fe-i:0.2
           resources:
             limits:
               memory: "384Mi"
