@@ -15,6 +15,7 @@ import {useNavigate} from "react-router-dom";
 // import axios from "axios";
 import { useSetAtom } from "jotai";
 import { userAtom } from "../../../atoms/userAtom.ts";
+import { IUser } from "../../../types/User.ts";
 
 export function SigninForm() {
     const navigate = useNavigate();
@@ -27,12 +28,13 @@ export function SigninForm() {
             // axios.defaults.headers.common["Authorization"] = `Bearer ${res.data.token}`;
             sessionStorage.setItem("token", res.data.token);
             setUser(res.data.user);
-            navigate("/home");
+            handleRolesNavigate(res.data.user)
         },
         onError: () => {
             setError(true);
         }
      })
+
     const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
@@ -43,6 +45,17 @@ export function SigninForm() {
             signinMutation({name: username, password});
         }
     };
+
+    const handleRolesNavigate = (userData: IUser) => {
+        const isRoot = userData?.roles.find((role: string) => role === "root");
+
+        if (isRoot) {
+            navigate("/general-metrics")
+        } else {
+            navigate("/home");
+        }
+
+    }
 
     return (
             <Container component="main" maxWidth="xs">
