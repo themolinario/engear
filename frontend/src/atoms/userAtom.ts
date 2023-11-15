@@ -10,6 +10,7 @@ export const userAtom = atom<IUser>({
   subscribedUsers: [],
   subscribers: 0,
   streamedTimeTotal: 0,
+  streamedData: 0,
   rebufferingEvents: 0,
   rebufferingTime: 0
 })

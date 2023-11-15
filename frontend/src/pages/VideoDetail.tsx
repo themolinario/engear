@@ -70,7 +70,8 @@ function VideoDetail() {
     onSuccess: ({ data }) => {
       videoMutations.updateViews.mutate(videoId);
       setPlayedSeconds(data?.streamedTimeTotal ?? 0);
-      setBaseURL(data.videoUrl.replace("https://firebasestorage.googleapis.com", "https://ik.imagekit.io/mmolinari"));
+      setBaseURL(data.videoUrl.replace("https://firebasestorage.googleapis.com", "https://ik.imagekit.io/mcamerino"));
+      //https://ik.imagekit.io/mmolinari
     },
     enabled: !isLoadingVideo,
     refetchOnWindowFocus: false

@@ -6,7 +6,7 @@ const baseURL = "http://localhost:80/api";
 export function getIPAddres () {
     axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
 
-    return axios.get<IIpAddress>('https://api.ipify.org?format=json', )
+    return axios.get<IIpAddress>('https://api.ipify.org?format=json')
 }
 
 export function getUserAgent () {
